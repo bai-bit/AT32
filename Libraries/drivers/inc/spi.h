@@ -13,8 +13,9 @@
 #define SPI_NSSSEL_SOFT         0x0200
 
 #define SPI_FRISTBIT_LSB        0x0080
-#define SPI_FRISTBIT_MSB        (~(1 << 7))
+#define SPI_FRISTBIT_MSB        0x0000
 #define SPI_CRCPOLYNOMIAL       (0x7)
+#define SPI_FristBit_Mask       (~(1 << 7))
 #define SPI_CR1_Mask            (0xE9F3)
 #define SPI_MODE_SEL            0xF7FF
 #define SPI1EN_CLK              0x0400
@@ -33,8 +34,23 @@
 #define SPI_BAUDRATE_128        0x0030
 #define SPI_BAUDRATE_256        0x0038
 
-void spi1_init(void);
-void spi_init(SPI_Type *SPIx);
+#define SPI_CPOLY_RESET         0x0007
+
+typedef struct 
+{
+	uint16_t SPI_Transmode;
+	uint16_t SPI_Mode;
+	uint16_t SPI_FrameSize;
+	uint16_t SPI_CPOL;
+	uint16_t SPI_CPHA;
+	uint16_t SPI_NSSSET;
+	uint16_t SPI_MCL;
+	uint16_t SPI_FirstBit;
+	uint16_t SPI_CPOLY;
+}SPI_InitType;
+
+
+void spi_init(SPI_Type *SPIx,SPI_InitType *SPI_InitStruct);
 FlagStatus spi_GetFlagStatus(SPI_Type *SPIx,uint16_t SPI_FLAG);
 void spi_resetbaud(SPI_Type *SPIx,uint32_t baud);
 void spi_cmd(SPI_Type *SPIx,FunctionalState status);

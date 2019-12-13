@@ -1,31 +1,38 @@
 #include<EN25QXXX.h>
 #include<systemclk.h>
 #include<uart.h>
-
+#include<string.h>
+#define SIZE 12
 
 int main(int argc,const char *argv[])
 {
-    uint16_t EN25Q_ID = 0;
+	u8 buf[SIZE] = "hello world";
+	u8 rbuf[SIZE] = "";
+	u8 status = 0;
+	int i;
     sysclk_PLLEN(PLLCLK_MUL_192MHz);
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     DelayInit();
     uart1_init(BAUD_115200);
     EN25QXXX_init(SPI1);
-//    GPIO_Init(HW_GPIOA,gpio_pin_4,gpio_speed_50MHz,mode_out_pp);
+   
 
- 
-    
+	status = EN25QXXX_read_register();
+	printf("status = [%X]\t\n",status);
+	EN25QXXX_erase_sector(0x800000);
+//	EN25QXXX_write_nocheck(0x800000,buf,SIZE);
+	EN25QXXX_write_data(0x800000,buf,SIZE);
+	EN25QXXX_read_data(0x800000,rbuf,SIZE);
+	//fputs((const char *)rbuf,stdout);
+	printf("rbuf = [%s]\t\n",rbuf);
+//	for(i = 0;i < SIZE;i++)
+//		printf("buf = [ %X ]   ",buf[i]);
+//	for(i = 0;i < 2 * SIZE;i++)
+//		printf("rbuf = [ %X ]  ",rbuf[i]);
     while(1)
     {
-//        GPIO_PinWrite(HW_GPIOA,gpio_pin_4,1);
-//        delayms(500);
-//        GPIO_PinWrite(HW_GPIOA,gpio_pin_4,0);
-//        delayms(500);
-    //    EN25QXXX_active_mode();
-        EN25Q_ID = EN25QXXX_readID(SPI1);
-        printf("EN25Q_ID = [%X]\t\n", EN25Q_ID);
-        delayms(100);
-        while(1);
+        
+      
     }
         
 }
