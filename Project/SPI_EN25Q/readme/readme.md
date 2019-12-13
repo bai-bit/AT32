@@ -37,9 +37,9 @@
 
     其实这两个问题，用一个图就能解释明白，下面我把它复制过来：
 
-    ![image-20191213123506565](EN25Q Programme.assets/image-20191213123506565.png)
+    ![image-20191213123506565](https://github.com/bai-bit/AT32/blob/master/Project/SPI_EN25Q/readme/EN25Q%20Programme.assets/image-20191213123506565.png)
 
-    由图可以知道，该闪存模块支持MODE0和MODE3两种模式，发送数据的协议是MSB，大端存储。由下面这一句英文：For Mode 0 the CLK signal is normally low. For Mode 3 the CLK signal is normally high. In either case data input on the DI pin is sampled on the rising edge of the CLK. Data output on the DO pin is clocked out on the falling edge of CLK。我们可以知道，数据在下降沿被锁存，上升沿被读取。然后我们通过查看电路图：![image-20191213124220263](EN25Q Programme.assets/image-20191213124220263.png)	我们可以看到，时钟线有被拉高的可能，我们通过查看实际的电路，发现R12被焊上一个电阻。所以时钟线被拉高，也就是说，在空闲状态下，时钟线为高电平，所以这里，我们CPOL（时钟极性）为1，相应的CPHA（时钟相位）也就设置为1，处于MODE3的SPI通信模式。
+    由图可以知道，该闪存模块支持MODE0和MODE3两种模式，发送数据的协议是MSB，大端存储。由下面这一句英文：For Mode 0 the CLK signal is normally low. For Mode 3 the CLK signal is normally high. In either case data input on the DI pin is sampled on the rising edge of the CLK. Data output on the DO pin is clocked out on the falling edge of CLK。我们可以知道，数据在下降沿被锁存，上升沿被读取。然后我们通过查看电路图：![image-20191213124220263](https://github.com/bai-bit/AT32/blob/master/Project/SPI_EN25Q/readme/EN25Q%20Programme.assets/image-20191213124220263.png)	我们可以看到，时钟线有被拉高的可能，我们通过查看实际的电路，发现R12被焊上一个电阻。所以时钟线被拉高，也就是说，在空闲状态下，时钟线为高电平，所以这里，我们CPOL（时钟极性）为1，相应的CPHA（时钟相位）也就设置为1，处于MODE3的SPI通信模式。
 
     ​	到这里我们的SPI配置就结束了，而且我本人在这里也吃了不小的亏，没有好好看芯片手册。接下来，我们先实现第一个功能，读取闪存的ID号。
 
@@ -70,21 +70,21 @@
     //第二次返回的id号表示闪存的容量
     ```
 
-    ![image-20191213125705316](EN25Q Programme.assets/image-20191213125705316.png)
+    ![image-20191213125705316](https://github.com/bai-bit/AT32/blob/master/Project/SPI_EN25Q/readme/EN25Q%20Programme.assets/image-20191213125705316.png)
 
 上面这张图是应该返回的结果，如果符合这个表，说明都ID操作正确。
 
 在这里还有一个坑，也是因为我没有仔细看手册，下面我贴出英文说明：
 
-![image-20191213130402510](EN25Q Programme.assets/image-20191213130402510.png)
+![image-20191213130402510](https://github.com/bai-bit/AT32/blob/master/Project/SPI_EN25Q/readme/EN25Q%20Programme.assets/image-20191213130402510.png)
 
-这一段话，说明了HOLD引脚的作用。在硬件上，这个引脚是浮空的，它的状态是未知的，可能是高电平，也可能是低电平。查看上面的英文介绍，当它为低电平，chip select也为低电平时，输出引脚就会变成高阻态，时钟线和输入引脚上的信号会被忽略。所以我们要想使用该闪存，就需要把这个HOLD引脚设置为高电平。解决的办法可以是在硬件上加焊一个1K的电阻，或者是用一个GPIO引脚把它拉到高电平，还有就是软件设置，写入寄存器，将状态寄存器的第六位置1.关闭HOLD。![image-20191213140815474](EN25Q Programme.assets/image-20191213140815474.png)
+这一段话，说明了HOLD引脚的作用。在硬件上，这个引脚是浮空的，它的状态是未知的，可能是高电平，也可能是低电平。查看上面的英文介绍，当它为低电平，chip select也为低电平时，输出引脚就会变成高阻态，时钟线和输入引脚上的信号会被忽略。所以我们要想使用该闪存，就需要把这个HOLD引脚设置为高电平。解决的办法可以是在硬件上加焊一个1K的电阻，或者是用一个GPIO引脚把它拉到高电平，还有就是软件设置，写入寄存器，将状态寄存器的第六位置1.关闭HOLD。![image-20191213140815474](https://github.com/bai-bit/AT32/blob/master/Project/SPI_EN25Q/readme/EN25Q%20Programme.assets/image-20191213140815474.png)
 
 这个位的下边还标明Non-volatile bit，这是一个掉电不丢失数据的位，也就是说，将他置1之后，只要不重新复位，它一直都是1。在这里，我没有处理这个引脚，导致在读取ID的时候，数据不稳定，能否读出id，完全看运气。我的处理结果就是在硬件上焊接了一个电阻。
 
 好，到这一步，已经能顺利读出ID，而不是之前的完全看运气读。接下来的读写操作就简单了，和操作内部flash的过程是一样，不同的是写入的单位不一样，读取数据，直接对地址进行寻址。写数据，EN25Q的最小写入一个字节，每次写入最多连续写入256个字节。擦除最小范围是一个扇区，扇区大小为4k，支持半块，块，全片的擦除操作。
 
-![image-20191213142820082](EN25Q Programme.assets/image-20191213142820082.png)
+![image-20191213142820082](https://github.com/bai-bit/AT32/blob/master/Project/SPI_EN25Q/readme/EN25Q%20Programme.assets/image-20191213142820082.png)
 
 上面这个图，列出了不同擦除范围所需要的时间。
 
@@ -124,7 +124,7 @@ void spim_init(SPI_Type *SPIx)
 }
 ```
 
-这是读取id号的操作，只要这个能实现，后续读写操作就容易了。在编写这些功能的时候，需要配合手册上的时序图来进行编写。![image-20191213143725266](EN25Q Programme.assets/image-20191213143725266.png)
+这是读取id号的操作，只要这个能实现，后续读写操作就容易了。在编写这些功能的时候，需要配合手册上的时序图来进行编写。![image-20191213143725266](https://github.com/bai-bit/AT32/blob/master/Project/SPI_EN25Q/readme/EN25Q%20Programme.assets/image-20191213143725266.png)
 
 ```c
 uint16_t EN25QXXX_readID(SPI_Type *SPIx)
