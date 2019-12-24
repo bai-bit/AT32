@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>EN25Q</TargetName>
+      <TargetName>IIC</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
@@ -48,7 +48,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Flash\</OutputDirectory>
-          <OutputName>Template</OutputName>
+          <OutputName>simulation_IIC</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -133,11 +133,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4096</DriverSelection>
+            <DriverSelection>-1</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash3></Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -187,7 +187,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>1</useUlib>
+            <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -311,8 +311,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F403Zx_XL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\Libraries\devices\inc;..\..\..\Libraries\drivers\inc;..\..\..\Libraries\startup\CoreSupport;..\..\..\Libraries\startup\DeviceSupport</IncludePath>
+              <IncludePath>..\..\..\Libraries\drivers\inc;..\..\..\Libraries\startup\CoreSupport;..\..\..\Libraries\startup\DeviceSupport;..\..\..\Libraries\devices\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -389,16 +389,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>startup</GroupName>
-          <Files>
-            <File>
-              <FileName>startup_at32f403zx_xl.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\Libraries\startup\DeviceSupport\startup\mdk\startup_at32f403zx_xl.s</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>driver</GroupName>
           <Files>
             <File>
@@ -407,9 +397,9 @@
               <FilePath>..\..\..\Libraries\drivers\src\gpio_init.c</FilePath>
             </File>
             <File>
-              <FileName>spi.c</FileName>
+              <FileName>nvic.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\drivers\src\spi.c</FilePath>
+              <FilePath>..\..\..\Libraries\drivers\src\nvic.c</FilePath>
             </File>
             <File>
               <FileName>systemclk.c</FileName>
@@ -417,34 +407,19 @@
               <FilePath>..\..\..\Libraries\drivers\src\systemclk.c</FilePath>
             </File>
             <File>
-              <FileName>uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\drivers\src\uart.c</FilePath>
-            </File>
-            <File>
-              <FileName>exti.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\drivers\src\exti.c</FilePath>
-            </File>
-            <File>
-              <FileName>nvic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\drivers\src\nvic.c</FilePath>
-            </File>
-            <File>
               <FileName>systick.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\Libraries\drivers\src\systick.c</FilePath>
             </File>
             <File>
-              <FileName>strfunc.c</FileName>
+              <FileName>uart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\drivers\src\strfunc.c</FilePath>
+              <FilePath>..\..\..\Libraries\drivers\src\uart.c</FilePath>
             </File>
             <File>
-              <FileName>spi_flash.c</FileName>
+              <FileName>iic.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\drivers\src\spi_flash.c</FilePath>
+              <FilePath>..\..\..\Libraries\drivers\src\iic.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -452,9 +427,19 @@
           <GroupName>device</GroupName>
           <Files>
             <File>
-              <FileName>EN25QXXX.c</FileName>
+              <FileName>AT24C02.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\devices\src\EN25QXXX.c</FilePath>
+              <FilePath>..\..\..\Libraries\devices\src\AT24C02.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>startup</GroupName>
+          <Files>
+            <File>
+              <FileName>startup_at32f403zx_xl.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\..\Libraries\startup\DeviceSupport\startup\mdk\startup_at32f403zx_xl.s</FilePath>
             </File>
           </Files>
         </Group>

@@ -2,9 +2,12 @@
 #define __EN25QXXX_H
 #include<at32f4xx.h>
 #include<gpio_init.h>
-#include<spi.h>
+#include<spi_flash.h>
 #include<stdio.h>
 #include<systick.h>
+#include<stdlib.h>
+
+
 
 #define SECSIZE              4096
 #define SECNUM               4096
@@ -25,17 +28,23 @@
 #define EN25Q_64K_ERASE      0x08
 #define EN25Q_CHIP_ERASE     0x60
 #define EN25Q_BASE           0X02
+typedef enum {ID,STATUS,DATA,SECTOR,CHIP}cmd;
 
-
-void EN25QXXX_init(SPI_Type *SPIx);
+uint16_t EN25QXXX_init(SPI_Type *SPIx);
 uint16_t EN25QXXX_readID(SPI_Type *SPIx);
-void spim_init(SPI_Type *SPIx);
-void EN25QXXX_active_mode(void);
-u8 *EN25QXXX_read_data(uint32_t addr,u8 *buf,uint32_t num);
-void EN25QXXX_wait_busy(void);
-u8 EN25QXXX_read_register(void);
-void EN25QXXX_erase_sector(uint32_t addr);
-void EN25QXXX_write_nocheck(uint32_t addr,u8 *buf,uint32_t bufnum);
-void EN25QXXX_write_data(uint32_t addr,u8 *buf,uint32_t bufnum);
+
+void EN25QXXX_active_mode(SPI_Type *SPIx);
+uint32_t EN25QXXX_read_data(SPI_Type *SPIx,const uint32_t addr,u8 *buf,uint32_t num);
+void EN25QXXX_wait_busy(SPI_Type *SPIx);
+uint8_t EN25QXXX_read_register(SPI_Type *SPIx);
+void EN25QXXX_erase_sector(SPI_Type *SPIx,const uint32_t addr);
+void EN25QXXX_write_nocheck(SPI_Type *SPIx,uint32_t addr,u8 *buf,uint32_t bufnum);
+uint32_t EN25QXXX_write_data(SPI_Type *SPIx,uint32_t addr,u8 *buf,uint32_t bufnum);
+void EN25QXXX_write_page(SPI_Type *SPIx,const uint32_t addr,u8 *buf,uint16_t bufnum);
+
+uint32_t EN25QXXX_read(SPI_Type *SPIx,uint32_t addr,uint8_t *rbuf,uint32_t num,uint8_t cmd);
+uint32_t EN25QXXX_write(SPI_Type *SPIx,uint32_t addr,uint8_t *buf,uint32_t num,uint8_t cmd);
+void EN25QXXX_clear(SPI_Type *SPIx,uint32_t addr,uint8_t cmd);
+void EN25QXXX_close(SPI_Type *SPIx);
 
 #endif

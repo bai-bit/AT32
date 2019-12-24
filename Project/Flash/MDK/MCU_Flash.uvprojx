@@ -402,16 +402,6 @@
               <FilePath>..\..\..\Libraries\drivers\src\nvic.c</FilePath>
             </File>
             <File>
-              <FileName>spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\drivers\src\spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>spi_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\drivers\src\spi_flash.c</FilePath>
-            </File>
-            <File>
               <FileName>systemclk.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\Libraries\drivers\src\systemclk.c</FilePath>
@@ -425,6 +415,11 @@
               <FileName>systick.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\Libraries\drivers\src\systick.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\Libraries\drivers\src\flash.c</FilePath>
             </File>
           </Files>
         </Group>

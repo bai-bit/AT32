@@ -15,12 +15,7 @@ void spi_init(SPI_Type *SPIx,SPI_InitType *SPI_InitStruct)
 		RCC->APB1EN |= RCC_APB1EN_SPI3EN;
 	else if(SPIx == SPI4)
 		RCC->APB1EN |= RCC_APB1EN_SPI4EN;
-	if(SPIx == SPI1)
-	{
-		GPIO_Init(HW_GPIOA, gpio_pin_5, gpio_speed_50MHz, mode_af_pp);
-		GPIO_Init(HW_GPIOA, gpio_pin_7, gpio_speed_50MHz, mode_af_pp);
-		GPIO_Init(HW_GPIOA, gpio_pin_6, gpio_speed_inno,mode_in_floating);
-	}
+	
 	
 	SPIx->CTRL2 &= ~SPI_CTRL2_MCLKP_3;
 	SPIx->CTRL1 &= SPI_CR1_Mask;
@@ -58,7 +53,15 @@ void spi_resetbaud(SPI_Type *SPIx,uint32_t baud)
         continue;
     spi_cmd(SPIx,DISABLE);
     SPIx->CTRL1 &= SPI_BAUDRATEMask;
-    SPIx->CTRL1 |= baud;
+	if(baud == SPI_BAUDRATE_512 )
+		SPIx->CTRL2 |= baud;
+	if(baud == SPI_BAUDRATE_1024)
+	{
+		SPIx->CTRL1 |= SPI_BAUDRATE_4;
+		SPIx->CTRL2 |= SPI_BAUDRATE_512;
+	}
+	else
+		SPIx->CTRL1 |= baud;
     spi_cmd(SPIx,ENABLE);
 }
 //add operation spi->DT register function

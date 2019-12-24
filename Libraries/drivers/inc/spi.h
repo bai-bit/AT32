@@ -33,6 +33,8 @@
 #define SPI_BAUDRATE_64         0x0028
 #define SPI_BAUDRATE_128        0x0030
 #define SPI_BAUDRATE_256        0x0038
+#define SPI_BAUDRATE_512        0x0100
+#define SPI_BAUDRATE_1024       0x0108
 
 #define SPI_CPOLY_RESET         0x0007
 
