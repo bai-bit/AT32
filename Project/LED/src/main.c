@@ -1,5 +1,6 @@
 #include<led.h>
 #include<systick.h>
+#include<systemclk.h>
 
 int main(int argc, const char *argv[])
 {
@@ -9,7 +10,10 @@ int main(int argc, const char *argv[])
 	
 	while(1)
 	{
-		GPIO_PinToggle(HW_GPIOD,gpio_pin_13);
+//		GPIO_PinToggle(HW_GPIOD,GPIO_PIN_13);
+        PDout(13) = 1;
 		delayms(500);
+        PDout(13) = 0;
+        delayms(500);
 	}
 }

@@ -7,12 +7,15 @@
 //clear
 //close
 spi_flash_dev_t operas;
+
 uint16_t spi_flash_open(SPI_Type *SPIx,spi_flash_dev_t *operation)
 {
 	//由设备端调用，初始化spi，获取设备的id号
 	uint16_t device_id;
-	
 	memcpy(&operas,operation,sizeof(spi_flash_dev_t));
+
+	operas.resetbaud(SPI1,SPI_CTRL1_MCLKP_2);
+	
 	device_id = operas.open(SPIx);
 	
 	return device_id;

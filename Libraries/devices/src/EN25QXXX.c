@@ -1,37 +1,29 @@
-//操作板子上的EN25Q存储芯片
-//首先，先实现最基本的功能：读取芯片的id，读取芯片的内容
-//然后，实现擦除和写一个字节的操作。
-//最后，实现写入任意长度的数据
-//使能一个GPIO口，用这个GPIO口来控制EN25Q的chip select
-//使能spi1
-//读取EN25Q的id号
-//在这里依据spi_flash的操作逻辑，传递相应的参数，实现对EN25Q的programer
-
 #include<EN25QXXX.h>
 
+EN25Q_SPIConfig EN25Q_spi_initstruct = {
+   
+    .SPI_Mode = SPI_CTRL1_MSTEN | SPI_CTRL1_ISS,
+   
+	.SPI_CPHA = SPI_CTRL1_CPHA,
+	.SPI_CPOL = SPI_CTRL1_CPOL,
+	.SPI_NSSSET = SPI_CTRL1_SWNSSEN,
+	.SPI_MCL = SPI_CTRL1_MCLKP,
+   
+	.SPI_CPOLY = 7
+};
+
+EN25Q_dev_t EN25Q_operation;
 
 //initialization EN25Q
+void EN25Q_module_init(EN25Q_dev_t *opers)
+{
+   memcpy(&EN25Q_operation,opers,sizeof(EN25Q_dev_t)); 
+}
 uint16_t EN25QXXX_init(SPI_Type *SPIx)
 {
 	uint16_t EN25Q_ID = 0;
-   	
-	GPIO_Init(HW_GPIOA,gpio_pin_4, gpio_speed_50MHz, mode_out_pp);
-    GPIO_PinWrite(HW_GPIOA, gpio_pin_4, 1);
-    
-	SPI_InitType SPI_InitStruct;
-			
-	SPI_InitStruct.SPI_Transmode = SPI_FULLDUPLEX;
-	SPI_InitStruct.SPI_Mode = SPI_CTRL1_MSTEN | SPI_CTRL1_ISS;
-	SPI_InitStruct.SPI_FrameSize = SPI_DATASIZE_8Bits;
-	SPI_InitStruct.SPI_CPHA = SPI_CTRL1_CPHA;
-	SPI_InitStruct.SPI_CPOL = SPI_CTRL1_CPOL;
-	SPI_InitStruct.SPI_FirstBit = SPI_FRISTBIT_MSB;
-	SPI_InitStruct.SPI_NSSSET = SPI_CTRL1_SWNSSEN;
-	SPI_InitStruct.SPI_MCL = SPI_CTRL1_MCLKP;
-	SPI_InitStruct.SPI_CPOLY = SPI_CPOLY_RESET;
-
-	spi_init(SPIx,&SPI_InitStruct);
-	spi_resetbaud(SPI1,SPI_BAUDRATE_64);
+   
+	
 	EN25QXXX_active_mode(SPIx);
 	EN25Q_ID |= EN25QXXX_readID(SPI1);
 	    
@@ -47,14 +39,14 @@ uint16_t EN25QXXX_readID(SPI_Type *SPIx)
     //then receive data by send ffh
     uint16_t ret = 0;
 
-    GPIO_PinWrite(HW_GPIOA, gpio_pin_4,0);
-    spi_RWdata(SPIx,READ_DEVICE_ID);
-	spi_RWdata(SPIx,0x00);
-	spi_RWdata(SPIx,0x00);
-	spi_RWdata(SPIx,0x00);
-	ret |= spi_RWdata(SPIx,SEND_DEFAULT_VALUE) << 8;
-	ret |= spi_RWdata(SPIx,SEND_DEFAULT_VALUE);
-    GPIO_PinToggle(HW_GPIOA, gpio_pin_4);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx, EN25Q_operation.Pin,0);
+    EN25Q_operation.msg_que(SPIx,READ_DEVICE_ID);
+	EN25Q_operation.msg_que(SPIx,0x00);
+	EN25Q_operation.msg_que(SPIx,0x00);
+	EN25Q_operation.msg_que(SPIx,0x00);
+	ret |= EN25Q_operation.msg_que(SPIx,SEND_DEFAULT_VALUE) << 8;
+	ret |= EN25Q_operation.msg_que(SPIx,SEND_DEFAULT_VALUE);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx, EN25Q_operation.Pin,1);
 	
     return ret;
 }
@@ -66,17 +58,17 @@ uint32_t EN25QXXX_read_data(SPI_Type *SPIx,uint32_t addr,u8 *rbuf,uint32_t num)
 	//读ID,读status,读data
    	uint32_t i = 0;
 	
-    GPIO_PinWrite(HW_GPIOA,gpio_pin_4,0);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,0);
 	
-	spi_RWdata(SPIx,EN25Q_FAST_READ);
-	spi_RWdata(SPIx,(u8)((addr) >> 16));
-	spi_RWdata(SPIx,(u8)((addr) >> 8));
-	spi_RWdata(SPIx,(u8)(addr));
+	EN25Q_operation.msg_que(SPIx,EN25Q_FAST_READ);
+	EN25Q_operation.msg_que(SPIx,(u8)((addr) >> 16));
+	EN25Q_operation.msg_que(SPIx,(u8)((addr) >> 8));
+	EN25Q_operation.msg_que(SPIx,(u8)(addr));
 	
 	for(i = 0;i < num;i++)
-		rbuf[i] = spi_RWdata(SPIx,SEND_DEFAULT_VALUE);
+		rbuf[i] = EN25Q_operation.msg_que(SPIx,SEND_DEFAULT_VALUE);
 	
-	GPIO_PinWrite(HW_GPIOA,gpio_pin_4,1);
+	EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,1);
     return sizeof(rbuf);
 }
 //read status register for en25q
@@ -84,28 +76,28 @@ uint8_t EN25QXXX_read_register(SPI_Type *SPIx)
 {
     uint8_t status = 0;
 		
-	GPIO_PinWrite(HW_GPIOA,gpio_pin_4,0);
+	EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,0);
 	
-	spi_RWdata(SPIx,EN25Q_READ_STATUS);
-	status = spi_RWdata(SPIx,SEND_DEFAULT_VALUE);
+	EN25Q_operation.msg_que(SPIx,EN25Q_READ_STATUS);
+	status = EN25Q_operation.msg_que(SPIx,SEND_DEFAULT_VALUE);
 
-    GPIO_PinToggle(HW_GPIOA,gpio_pin_4);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,1);
     
     return status;
 }
 //write enable
 void EN25QXXX_write_enable(SPI_Type *SPIx)
 {
-    GPIO_PinWrite(HW_GPIOA,gpio_pin_4,0);
-    spi_RWdata(SPIx,EN25Q_WRITE_ENABLE);
-    GPIO_PinToggle(HW_GPIOA,gpio_pin_4);    
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,0);
+    EN25Q_operation.msg_que(SPIx,EN25Q_WRITE_ENABLE);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,1);    
 }
 //write disable
 void EN25QXXX_write_disable(SPI_Type *SPIx)
 {
-    GPIO_PinWrite(HW_GPIOA,gpio_pin_4,0);
-    spi_RWdata(SPIx,EN25Q_WRITE_DISABLE);
-    GPIO_PinToggle(HW_GPIOA,gpio_pin_4);    
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,0);
+    EN25Q_operation.msg_que(SPIx,EN25Q_WRITE_DISABLE);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,1);    
 }
 //write data to en25q
 u8 secbuf[SECSIZE];
@@ -173,16 +165,16 @@ void EN25QXXX_write_page(SPI_Type *SPIx,const uint32_t addr,u8 *buf,uint16_t buf
     EN25QXXX_write_enable(SPIx);
     EN25QXXX_wait_busy(SPIx);
 
-    GPIO_PinWrite(HW_GPIOA,gpio_pin_4,0);
-    spi_RWdata(SPIx,EN25Q_PAGE_PROGRAM);
-    spi_RWdata(SPIx,(u8)((addr) >> 16));
-    spi_RWdata(SPIx,(u8)((addr) >> 8));
-    spi_RWdata(SPIx,(u8)(addr));
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,0);
+    EN25Q_operation.msg_que(SPIx,EN25Q_PAGE_PROGRAM);
+    EN25Q_operation.msg_que(SPIx,(u8)((addr) >> 16));
+    EN25Q_operation.msg_que(SPIx,(u8)((addr) >> 8));
+    EN25Q_operation.msg_que(SPIx,(u8)(addr));
 
     for(i = 0;i < bufnum;i++)
-		spi_RWdata(SPIx,buf[i]);
+		EN25Q_operation.msg_que(SPIx,buf[i]);
 	
-    GPIO_PinToggle(HW_GPIOA,gpio_pin_4);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,1);
     EN25QXXX_wait_busy(SPIx);
 }
 
@@ -218,14 +210,14 @@ void EN25QXXX_erase_sector(SPI_Type *SPIx,const uint32_t addr)
     EN25QXXX_write_enable(SPIx);
     EN25QXXX_wait_busy(SPIx);
     
-    GPIO_PinWrite(HW_GPIOA,gpio_pin_4,0);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,0);
 		
-    spi_RWdata(SPIx,EN25Q_SECTOR_ERASE);
-    spi_RWdata(SPIx,(u8)((temp) >> 16));
-    spi_RWdata(SPIx,(u8)((temp) >> 8));
-    spi_RWdata(SPIx,(u8)(temp));
+    EN25Q_operation.msg_que(SPIx,EN25Q_SECTOR_ERASE);
+    EN25Q_operation.msg_que(SPIx,(u8)((temp) >> 16));
+    EN25Q_operation.msg_que(SPIx,(u8)((temp) >> 8));
+    EN25Q_operation.msg_que(SPIx,(u8)(temp));
 
-    GPIO_PinToggle(HW_GPIOA,gpio_pin_4);  
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,1);  
     
 	EN25QXXX_wait_busy(SPIx);
 }
@@ -235,9 +227,9 @@ void EN25QXXX_chip_erase(SPI_Type *SPIx)
     EN25QXXX_write_enable(SPIx);
     EN25QXXX_wait_busy(SPIx);
     
-    GPIO_PinWrite(HW_GPIOA,gpio_pin_4,0);
-    spi_RWdata(SPIx,EN25Q_CHIP_ERASE);
-    GPIO_PinToggle(HW_GPIOA,gpio_pin_4);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,0);
+    EN25Q_operation.msg_que(SPIx,EN25Q_CHIP_ERASE);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,1);
     EN25QXXX_wait_busy(SPIx);
 }
 //wait busy
@@ -250,19 +242,17 @@ void EN25QXXX_wait_busy(SPI_Type *SPIx)
 //active mode
 void EN25QXXX_active_mode(SPI_Type *SPIx)
 {
-    GPIO_PinWrite(HW_GPIOA,gpio_pin_4,0);
-	spi_RWdata(SPIx,EN25Q_RELEASE_SLEEP);
-    GPIO_PinWrite(HW_GPIOA,gpio_pin_4,1);
-    delayms(10);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,0);
+	EN25Q_operation.msg_que(SPIx,EN25Q_RELEASE_SLEEP);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,1);
 }
 
 //sleep mode
 void EN25QXXX_sleep_mode(SPI_Type *SPIx)
 {
-    GPIO_PinWrite(HW_GPIOA,gpio_pin_4,0);
-	spi_RWdata(SPIx,EN25Q_DEEP_POWER);
-	GPIO_PinWrite(HW_GPIOA,gpio_pin_4,1);
-	delayms(10);
+    EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,0);
+	EN25Q_operation.msg_que(SPIx,EN25Q_DEEP_POWER);
+	EN25Q_operation.cs(EN25Q_operation.GPIOx,EN25Q_operation.Pin,1);
 }
 
 //在这个文件中，实现对flash的操作
@@ -315,5 +305,4 @@ void EN25QXXX_clear(SPI_Type *SPIx,uint32_t addr,uint8_t cmd)
 void EN25QXXX_close(SPI_Type *SPIx)
 {
 	EN25QXXX_sleep_mode(SPIx);
-	spi_cmd(SPIx,DISABLE);
 }

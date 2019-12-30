@@ -1,6 +1,6 @@
-
 #include<uart.h>
 #include<strfunc.h>
+#include<systick.h>
 
 
 void SysTick_Handler(void);
@@ -17,7 +17,6 @@ int main(int argc, const char *argv[])
 	printf("0x%p\r\n", SysTick_Handler);
 	while(1)
 	{
-	//printf("count = [%d] ",123);
 		delayms(500);
 	}
 }
@@ -27,10 +26,9 @@ int main(int argc, const char *argv[])
 void SysTick_Handler(void)
 {
 	//打印计数值
-	char *str = 0;
+
 	static uint32_t count = 0;
 	count++;
-//	str = itoa(count);
-//	log_uart(HW_USART1, str);
+
 	printf("count = [%d] ",count);
 }

@@ -1,7 +1,7 @@
 #ifndef __SPI_H
 #define __SPI_H
 #include<at32f4xx.h>
-#include<gpio_init.h>
+
 
 #define SPI_FULLDUPLEX          0x0000
 #define SPI_WORKMODE_Master     0x0104

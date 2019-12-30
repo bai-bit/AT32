@@ -4,6 +4,7 @@
 #include<nvic.h>
 #include<exti.h>
 #include<at32f4xx.h>
+#include<uart.h>
 
 void uart1_io_config(void);
 void uart_virtual(uint32_t baud);

@@ -8,10 +8,10 @@ void uart1_io_config(void)
 	//配置AFIO,EXTIC的寄存器，外部中断输入源
 	//初始化外部中断
 	//使能外部中断
-	GPIO_Init(HW_GPIOA, gpio_pin_9, gpio_speed_50MHz, mode_out_pp);
+	GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Speed_50MHz, GPIO_Mode_Out_PP);
 	
-	GPIO_Init(HW_GPIOA, gpio_pin_10, gpio_speed_inno, mode_in_floating);
-	AFIO_Init(HW_GPIOA, gpio_pin_10);
+	GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Speed_INNO, GPIO_Mode_IN_FLOATING);
+	AFIO_Init(HW_GPIOA, GPIO_PIN_10);
 	exti_init(exti_line10, interrupt, failling, ENABLE);
 	NVIC_Init(EXTI15_10_IRQn, 2, 3, ENABLE);
 }
@@ -58,7 +58,7 @@ uint8_t uart_recvive_data(uint32_t uartnum)
 		//串口默认LSB发送（小端存储）
 		//发送过来的数据是ASCII码格式
 		delayus(uart_delayus - 1); 
-		data |= (read_gpioport(HW_GPIOA, gpio_pin_10) << i);
+		data |= (read_gpioport(HW_GPIOA, GPIO_PIN_10) << i);
 	}
 	
 	return data;
@@ -80,7 +80,7 @@ uint16_t  readdata(uint32_t uartnum)
 	switch(uartnum)
 	{
 		case HW_USART1:
-			return read_gpioport(HW_GPIOA, gpio_pin_10);
+			return read_gpioport(HW_GPIOA, GPIO_PIN_10);
 		case HW_USART2:
 		case HW_USART3:
 		case HW_UART4:
@@ -103,7 +103,7 @@ void virtual_serial(uint32_t uartnum, uint16_t data)
 	for(i = 0; i < 10; i++)
 	{
 		bit_data = (data >>i) & 0x01;
-		GPIO_PinWrite(HW_GPIOA, gpio_pin_9, bit_data);
+		GPIO_PinWrite(HW_GPIOA, GPIO_PIN_9, bit_data);
 		delayus(uart_delayus - 1);
 	}
 }
@@ -114,7 +114,7 @@ void writedata(uint32_t uartnum, uint16_t data)
 	switch(uartnum)
 	{
 		case HW_USART1:
-			GPIO_PinWrite(HW_GPIOA, gpio_pin_9, data);
+			GPIO_PinWrite(HW_GPIOA, GPIO_PIN_9, data);
 			break;
 		case HW_USART2:
 		case HW_USART3:

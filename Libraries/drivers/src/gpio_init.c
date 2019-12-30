@@ -2,7 +2,7 @@
 
 GPIO_Type* gpio_list[]={GPIOA, GPIOB, GPIOC, GPIOD, GPIOE};
 
-void GPIO_Init(uint32_t GPIOx, uint16_t pin, gpiospeed speed, gpiomode mode)
+void GPIO_Init(uint32_t GPIOx, uint16_t pin, GPIOSpeed speed, GPIO_t mode)
 {
     int pinmode = 0;
     int temp = 0, pinmask = 0;
@@ -38,9 +38,9 @@ void GPIO_Init(uint32_t GPIOx, uint16_t pin, gpiospeed speed, gpiomode mode)
 			temp &= ~pinmask;
 			temp |= pinmode << pin;
         
-			if(mode == mode_in_pu)
+			if(mode == GPIO_Mode_IPU)
 				gpio_list[GPIOx]->BSRE |= 1 << pin;
-			else if(mode == mode_in_pd)
+			else if(mode == GPIO_Mode_IPD)
 				gpio_list[GPIOx]->BRE |= 1 << pin;
       
 			gpio_list[GPIOx]->CTRLL = temp;
@@ -53,9 +53,9 @@ void GPIO_Init(uint32_t GPIOx, uint16_t pin, gpiospeed speed, gpiomode mode)
 			pinmask = 0xf << pin;
 			temp &= ~pinmask;
 			temp |= pinmode << pin;
-			if(mode == mode_in_pu)
+			if(mode == GPIO_Mode_IPU)
 				gpio_list[GPIOx]->BSRE |= 1 << pin;
-			else if(mode == mode_in_pu)
+			else if(mode == GPIO_Mode_IPU)
 				gpio_list[GPIOx]->BRE |= 1 << pin;
        
 			gpio_list[GPIOx]->CTRLH = temp;
@@ -73,7 +73,7 @@ void AFIO_Init(uint32_t GPIOx, uint16_t pin)
 	AFIO->EXTIC[pin >> 2] |= GPIOx << ((pin & 0x03) * 0x04);
 	
 }
-void GPIO_PinWrite(uint32_t GPIOx, uint16_t pin, uint32_t num)
+void GPIO_PinWrite(uint32_t GPIOx, uint16_t pin, uint8_t num)
 {
     if(num)
         gpio_list[GPIOx]->BSRE = 1 << pin;
@@ -98,7 +98,7 @@ uint16_t read_gpioport(uint32_t GPIOx, uint16_t pin)
 
 void CLKOUT_Init(uint16_t GPIOx,uint16_t pin)
 {
-	GPIO_Init(GPIOx,pin,gpio_speed_50MHz,mode_af_pp);
+	GPIO_Init(GPIOx,pin,GPIO_Speed_50MHz,GPIO_Mode_AF_PP);
 }          
 
 
