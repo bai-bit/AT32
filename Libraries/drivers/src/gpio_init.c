@@ -2,7 +2,7 @@
 
 GPIO_Type* gpio_list[]={GPIOA, GPIOB, GPIOC, GPIOD, GPIOE};
 
-void GPIO_Init(uint32_t GPIOx, uint16_t pin, GPIOSpeed speed, GPIO_t mode)
+void GPIO_Init(uint32_t GPIOx, uint16_t pin,GPIO_t mode)
 {
     int pinmode = 0;
     int temp = 0, pinmask = 0;
@@ -27,7 +27,7 @@ void GPIO_Init(uint32_t GPIOx, uint16_t pin, GPIOSpeed speed, GPIO_t mode)
 
     pinmode = mode & 0xf;
     if((mode & 0x10) == 0x10)
-    	pinmode |= speed;
+    	pinmode |= GPIO_Speed_50MHz;
   
     if(pin < 8) 
     {
@@ -62,6 +62,13 @@ void GPIO_Init(uint32_t GPIOx, uint16_t pin, GPIOSpeed speed, GPIO_t mode)
     }
 }
 
+void GPIO_resetSpeed(uint32_t GPIOx,uint16_t pin,uint8_t speed)
+{
+    if(pin < 8)
+        gpio_list[GPIOx]->CTRLL |= speed << (pin << 2);
+    else if(pin >= 8 && pin < 16)
+        gpio_list[GPIOx]->CTRLH |= speed << ((pin - 8) << 2);
+}
 void AFIO_Init(uint32_t GPIOx, uint16_t pin)
 {
 	//¿ªÆôAFIOµÄÊ±ÖÓ
@@ -98,7 +105,7 @@ uint16_t read_gpioport(uint32_t GPIOx, uint16_t pin)
 
 void CLKOUT_Init(uint16_t GPIOx,uint16_t pin)
 {
-	GPIO_Init(GPIOx,pin,GPIO_Speed_50MHz,GPIO_Mode_AF_PP);
+	GPIO_Init(GPIOx,pin,GPIO_Mode_AF_PP);
 }          
 
 

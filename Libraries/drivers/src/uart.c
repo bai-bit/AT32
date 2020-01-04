@@ -1,7 +1,7 @@
 #include<uart.h>
 
 USART_Type* uart_list[]={USART1, USART2, USART3, UART4, UART5};
-char uart_rx_buf[UART_SIZE]= "";
+char uart_rx_buf[UART_RX_BUF_SIZE]= "";
 uint16_t uart_rx_status;
 
 uint32_t UART_Init(uint32_t instance, uint32_t baudrate)
@@ -32,23 +32,22 @@ uint32_t UART_Init(uint32_t instance, uint32_t baudrate)
 			return 0;
 	}
 	
-	uint32_t tmpreg;
+	uint32_t tmpreg = 0;
 
     tmpreg = uart_list[instance]->CTRL1;
     tmpreg &= CTRL1_MASK;
-    tmpreg |= USART_CTRL1_8LEN | PARITY_NONE | USART_CTRL1_REN | USART_CTRL1_TEN;
-    
+    tmpreg |=   USART_CTRL1_REN | USART_CTRL1_TEN;
     uart_list[instance]->CTRL1 = (uint16_t)tmpreg;
     
     tmpreg = uart_list[instance]->CTRL2;
     tmpreg &= CTRL2_STOP_Mask;
-    tmpreg |= USART_CTRL2_STOP_B;
+
 
     uart_list[instance]->CTRL2 = (uint16_t)tmpreg;
 
     tmpreg = uart_list[instance]->CTRL3;
     tmpreg &= CTRL3_Mask;
-    tmpreg |= USART_CTRL3_NONE;
+   
     uart_list[instance]->CTRL3 = (uint16_t)tmpreg;
 
     UART_SetBaudRate(instance,baudrate);
@@ -63,7 +62,7 @@ uint32_t UART_Init(uint32_t instance, uint32_t baudrate)
 
 uint32_t UART_DeInit(uint32_t instance)
 {
-    uart_list[instance]->CTRL1 &= ~UART_ENABLE;
+    uart_list[instance]->CTRL1 &= ~USART_CTRL1_UEN;
     return 0;
 }
 void UART_SetBaudRate(uint32_t instance, uint32_t baud)
@@ -124,27 +123,27 @@ void USART_Cmd(uint32_t instance, FunctionalState NewStatus)
 	//使能串口,配置CR1寄存器的第十三位
 	
     if(NewStatus == ENABLE)
-        uart_list[instance]->CTRL1 |= UART_ENABLE;
+        uart_list[instance]->CTRL1 |= USART_CTRL1_UEN;
     else
-        uart_list[instance]->CTRL1 &= ~UART_ENABLE;
+        uart_list[instance]->CTRL1 &= ~USART_CTRL1_UEN;
 }
 
 
 void log_uart(uint8_t instance, char *buf)
 {
-    u8 send_buf[UART_SIZE];
+    u8 send_buf[UART_RX_BUF_SIZE];
     uint32_t i;
-    for(i=0;i<UART_SIZE;i++)
+    for(i = 0;i < UART_RX_BUF_SIZE;i++)
     {
         send_buf[i] = *buf++;
         if(send_buf[i] == '\0')
-            i=UART_SIZE;
+            i = UART_RX_BUF_SIZE;
 	}
-	for(i=0;i<UART_SIZE;i++)
+	for(i = 0;i < UART_RX_BUF_SIZE;i++)
 	{
 		call_back_send(instance,send_buf[i]);
 		if(send_buf[i] == '\0')
-			i = UART_SIZE;
+			i = UART_RX_BUF_SIZE;
 	}
 }
 
@@ -154,7 +153,6 @@ void call_back_send(uint8_t instance, char ch)
         continue;
     uart_list[instance]->DT =(uint8_t) ch;
 }
-
 
 ITStatus uart_getinter(uint32_t instance, uint32_t uart_interrupt)
 {
@@ -246,7 +244,7 @@ void USART1_IRQHandler(void)
 				{
 					uart_rx_buf[uart_rx_status & UART_STATUS_MASK] = rev;
 					uart_rx_status ++;
-					if(uart_rx_status > UART_SIZE)
+					if(uart_rx_status > UART_RX_BUF_SIZE)
 						uart_rx_status = RESET;
 				}
 			}

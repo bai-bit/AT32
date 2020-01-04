@@ -1,35 +1,85 @@
 #include<spi.h>
 
-void spi_init(SPI_Type *SPIx,SPI_InitType *SPI_InitStruct)
+void spi_init(SPI_Type *SPIx,uint32_t baud)
 {
     //首先配置为缺省值。全是0
 	//然后根据自己的需要配寄存器
 	//配置的内容：数据的传输方向，全双工，8位数据帧，lsb的格式帧，分频系数256，主机模式，cpol = 0，cpha = 1，nss值，crc
 	//使能spi的时钟
 	//最后使能spi
-	if(SPIx == SPI1)
-		RCC->APB2EN |= RCC_APB2EN_SPI1EN;
-	else if(SPIx == SPI2)
-		RCC->APB1EN |= RCC_APB1EN_SPI2EN;
-	else if(SPIx == SPI3)
-		RCC->APB1EN |= RCC_APB1EN_SPI3EN;
-	else if(SPIx == SPI4)
-		RCC->APB1EN |= RCC_APB1EN_SPI4EN;
-	
-	
-	SPIx->CTRL2 &= ~SPI_CTRL2_MCLKP_3;
-	SPIx->CTRL1 &= SPI_CR1_Mask;
-	
-	SPIx->CTRL1 |= (SPI_InitStruct->SPI_Transmode | SPI_InitStruct->SPI_Mode | SPI_InitStruct->SPI_FrameSize | SPI_InitStruct->SPI_CPOL | SPI_InitStruct->SPI_CPHA | SPI_InitStruct->SPI_NSSSET | SPI_InitStruct->SPI_MCL);
-    SPIx->CTRL1 &=  SPI_FristBit_Mask;
-	SPIx->CTRL1 |= SPI_InitStruct->SPI_FirstBit;
+    if(SPIx == SPI1)
+        RCC->APB2EN |= RCC_APB2EN_SPI1EN;
+    else if(SPIx == SPI2)
+        RCC->APB1EN |= RCC_APB1EN_SPI2EN;
+    else if(SPIx == SPI3)
+        RCC->APB1EN |= RCC_APB1EN_SPI3EN;
+    else if(SPIx == SPI4)
+        RCC->APB1EN |= RCC_APB1EN_SPI4EN;
+
+    SPIx->CTRL2 &= ~SPI_CTRL2_MCLKP_3;
+    SPIx->CTRL1 &= SPI_CR1_Mask;
+
+    SPIx->CTRL1 |= (SPI_CTRL1_MSTEN | SPI_CTRL1_ISS  | SPI_CTRL1_SWNSSEN | baud);
+    SPIx->CTRL1 &=  ~(SPI_CTRL1_LSBEN);
 
     SPIx->I2SCTRL &= SPI_MODE_SEL;
-    SPIx->CPOLY = SPI_InitStruct->SPI_CPOLY;
-
+    SPIx->CPOLY = SPI_CPOLY_RESET;
+    
     spi_cmd(SPIx, ENABLE);
 }
-
+void spi_resetMode(SPI_Type *SPIx,uint8_t mode)
+{
+    //MSTEN
+    while(spi_GetFlagStatus(SPIx,SPI_Flag_BSY) == SET)
+        continue;
+    spi_cmd(SPIx,DISABLE);
+    SPIx->CTRL1 &= ~(SPI_CTRL1_MSTEN);
+    SPIx->CTRL1 |= mode;
+    spi_cmd(SPIx,ENABLE);
+}
+void spi_resetTR(SPI_Type *SPIx,uint8_t mode)
+{
+    while(spi_GetFlagStatus(SPIx,SPI_Flag_BSY) == SET)
+        continue;
+    spi_cmd(SPIx,DISABLE);
+    SPIx->CTRL1 &= ~(SPI_CTRL1_CPHA | SPI_CTRL1_CPOL);
+    switch(mode)
+    {
+        case MODE0:
+            break;
+        case MODE1:
+            SPIx->CTRL1 |= (SPI_CTRL1_CPOL);
+            break;
+        case MODE2:
+            SPIx->CTRL1 |= (SPI_CTRL1_CPHA);
+            break;
+        case MODE3:
+            SPIx->CTRL1 |= (SPI_CTRL1_CPHA | SPI_CTRL1_CPOL);
+            break;
+        default:
+            printf("reset TR error");
+    }
+ 
+    spi_cmd(SPIx,ENABLE);
+}
+void spi_resetTransmode(SPI_Type *SPIx,uint8_t Transmode)
+{
+    while(spi_GetFlagStatus(SPIx,SPI_Flag_BSY) == SET)
+        continue;
+    spi_cmd(SPIx,DISABLE);
+    SPIx->CTRL1 &=~(SPI_CTRL1_LSBEN);
+    SPIx->CTRL1 |= Transmode;
+    spi_cmd(SPIx,ENABLE);
+}
+void spi_resetFirstBits(SPI_Type *SPIx,uint8_t FirstBits)
+{
+    while(spi_GetFlagStatus(SPIx,SPI_Flag_BSY) == SET)
+        continue;
+    spi_cmd(SPIx,DISABLE);
+    SPIx->CTRL1 &= ~(SPI_CTRL1_DFF16);
+    SPIx->CTRL1 |= FirstBits;
+    spi_cmd(SPIx,ENABLE);
+}
 void spi_cmd(SPI_Type *SPIx,FunctionalState status)
 {
     if(status == ENABLE)

@@ -1,42 +1,23 @@
 #ifndef __UART_H
 #define __UART_H
 #include<at32f4xx.h>
-#include<nvic.h>
+#include<common.h>
 #include<stdio.h>
-#include<systick.h>
 
-#define HW_USART1 (0)
-#define HW_USART2 (1)
-#define HW_USART3 (2)
-#define HW_UART4  (3)
-#define HW_UART5  (4)
+#define HW_USART1               (0)
+#define HW_USART2               (1)
+#define HW_USART3               (2)
+#define HW_UART4                (3)
+#define HW_UART5                (4)
 
-//wordlength,stopbits,parity,mode,hardcontrol
-#define USART_CTRL1_8LEN        0x0000
-
-#define USART_CTRL2_STOP_B      0x0
-
-
-#define PARITY_NONE             0x0
-#define PARITY_EVEN             0x400
-#define PARITY_ODD              0x600
-
-
-#define USART_CTRL3_NONE        0x0
-  
 #define UART_INT_RDNE           0x0525
 #define UART_INT_TXE            0x0727
-
 #define CTRL1_MASK              0x29f3
 #define CTRL2_STOP_Mask         0xcfff
 #define CTRL3_Mask              0x4ff
-
 #define REGMASK                 0x1f
-
-#define UART_ENABLE             0x2000
 #define UART_DATA_MASK          0x1ff
-
-#define UART_SIZE               4096
+#define UART_RX_BUF_SIZE        4096
 
 #define VIRTUAL_BAUD            1000000.00
 #define BAUD_9600               9600
@@ -48,7 +29,7 @@
 #define UART_STATUS_ENTER       0x4000
 #define UART_STATUS_NLINE       0x8000 
 
-extern char uart_rx_buf[UART_SIZE];
+extern char uart_rx_buf[UART_RX_BUF_SIZE];
 extern uint16_t uart_rx_status;
 
 typedef enum
@@ -63,7 +44,7 @@ ITStatus uart_getinter(uint32_t uartnum,uint32_t uart_interrupt);
 void log_uart(uint8_t uartnum,char *buf);
 void call_back_send(uint8_t uartnum,char ch);
 uint16_t  uartrecvive_data(uint32_t uartnum);
-uint32_t UART_Init(uint32_t instance, uint32_t baudrate);//,uint32_t wordlength,uint32_t stopbits,uint32_t parity,uint32_t mode,uint32_t hardcontrol);
+uint32_t UART_Init(uint32_t instance, uint32_t baudrate);
 void USART_ITConfig(uint32_t uartnum,uint16_t uart_interrupt,FunctionalState NewStatus);
 void USART_Cmd(uint32_t uartnum,FunctionalState NewStatus);
 

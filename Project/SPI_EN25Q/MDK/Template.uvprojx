@@ -422,11 +422,6 @@
               <FilePath>..\..\..\Libraries\drivers\src\uart.c</FilePath>
             </File>
             <File>
-              <FileName>exti.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\drivers\src\exti.c</FilePath>
-            </File>
-            <File>
               <FileName>nvic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\Libraries\drivers\src\nvic.c</FilePath>
@@ -435,11 +430,6 @@
               <FileName>systick.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\Libraries\drivers\src\systick.c</FilePath>
-            </File>
-            <File>
-              <FileName>strfunc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\drivers\src\strfunc.c</FilePath>
             </File>
             <File>
               <FileName>spi_flash.c</FileName>

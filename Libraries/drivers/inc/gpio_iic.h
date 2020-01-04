@@ -1,14 +1,7 @@
-//simulation sequence to iic
-//start signal
-//stop signal
-
-//answer signal
-//send byte
-//receiv
 #ifndef IIC_H
 #define IIC_H
 #include<gpio_init.h>
-#include<systick.h>
+#include<common.h>
 #include<stdio.h>
 
 #define IIC_SDA_OUT    {GPIOB->CTRLH &= 0xFFFFFF0F;GPIOB->CTRLH |= (3 << 4);}
