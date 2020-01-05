@@ -78,11 +78,13 @@ uint32_t getclock_frequency(CLOCKFRE_t clock)
     //PLL一般等于systemcoreclock
     //AHB,APB1,APB2,先获取RCC->CFG value
     //然后用systemcoreclock计算，return value
-    pll_frafremask = (PLL_FRAMASK & RCC->CFG); 
+     
     //分频计算
     //将pll_frafremask的值与上0x6000 0000；把这个值右移25位
     //将pll_frafremask的值与上0x003c 0000；把这个值右移18位
     //然后将上的两个值相或，根据结果加一来确定分频系数。
+    
+    pll_frafremask = (PLL_FRAMASK & RCC->CFG);
     pll_value1 = pll_frafremask & PLL_FRAMASK1;
     pll_value2 = pll_frafremask & PLL_FRAMASK2;
     
