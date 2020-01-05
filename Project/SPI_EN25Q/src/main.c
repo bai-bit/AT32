@@ -12,10 +12,10 @@ void flash_board_module_init(void);
 
 spi_flash_dev_t operation = {
     .open = EN25QXXX_init,
-    .read = EN25QXXX_read,
+    .read = EN25QXXX_read_data,
     .write = EN25QXXX_write_page,
-    .clear = EN25QXXX_clear,
-    .release = EN25QXXX_close,
+    .clear = EN25QXXX_erase_sector,
+    .release = EN25QXXX_sleep_mode,
     .resetbaud = EN25QXXX_baud
 };
 

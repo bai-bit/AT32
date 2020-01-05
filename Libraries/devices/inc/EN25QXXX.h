@@ -35,22 +35,18 @@ typedef struct EN25Q_dev_t {
 
 void EN25Q_module_init(EN25Q_dev_t *opers);
 uint16_t EN25QXXX_init(void);
-void EN25QXXX_active_mode(void);
-void EN25QXXX_wait_busy(void);
+static void EN25QXXX_active_mode(void);
+static void EN25QXXX_wait_busy(void);
 
-uint32_t EN25QXXX_write(uint32_t addr,uint8_t *buf,uint32_t num);
 void EN25QXXX_write_nocheck(uint32_t addr,uint8_t *buf,uint32_t bufnum);
 uint32_t EN25QXXX_write_data(uint32_t addr,uint8_t *buf,uint32_t bufnum);
 uint32_t EN25QXXX_write_page(uint32_t addr,uint8_t *buf,uint32_t bufnum);
 
-uint32_t EN25QXXX_read(uint32_t addr,uint8_t *rbuf,uint32_t num);
 uint16_t EN25QXXX_readID(void);
 uint32_t EN25QXXX_read_data(uint32_t addr,uint8_t *buf,uint32_t bufnum);
-uint8_t EN25QXXX_read_register(void);
+static uint8_t EN25QXXX_read_register(void);
 
-void EN25QXXX_clear(uint32_t addr);
 void EN25QXXX_erase_sector(const uint32_t addr);
-void EN25QXXX_close(void);
 void EN25QXXX_sleep_mode(void);
 void EN25QXXX_baud(uint32_t baud);
 #endif

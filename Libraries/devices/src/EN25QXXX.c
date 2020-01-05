@@ -59,7 +59,7 @@ uint32_t EN25QXXX_read_data(uint32_t addr,uint8_t *rbuf,uint32_t bufnum)
     return sizeof(rbuf);
 }
 //read status register for en25q
-uint8_t EN25QXXX_read_register(void)
+static uint8_t EN25QXXX_read_register(void)
 {
     uint8_t status = 0;
     
@@ -73,14 +73,14 @@ uint8_t EN25QXXX_read_register(void)
     return status;
 }
 //write enable
-void EN25QXXX_write_enable(void)
+static void EN25QXXX_write_enable(void)
 {
     EN25Q_operation.cs(0);
     EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_WRITE_ENABLE);
     EN25Q_operation.cs(1);    
 }
 //write disable
-void EN25QXXX_write_disable(void)
+static void EN25QXXX_write_disable(void)
 {
     EN25Q_operation.cs(0);
     EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_WRITE_DISABLE);
@@ -90,8 +90,9 @@ void EN25QXXX_write_disable(void)
 //uint8_t secbuf[SECSIZE];
 uint32_t EN25QXXX_write_data(uint32_t addr,uint8_t *buf,uint32_t bufnum)
 {
+    uint32_t m = 0;
 //    uint32_t sectorid = 0,secoffset = 0,secsurplus = 0;
-//    uint32_t i = 0,m = 0;
+//    uint32_t i = 0;
 //    uint8_t *temp_buf = secbuf;
 //    
 //    if(addr < EN25Q_BASE && addr > SECSIZE * SECNUM)
@@ -140,7 +141,7 @@ uint32_t EN25QXXX_write_data(uint32_t addr,uint8_t *buf,uint32_t bufnum)
 //            m += secsurplus;
 //        }
 //    }
-//    return m;
+    return m;
 }
 
 //256 or >256
@@ -220,14 +221,14 @@ void EN25QXXX_chip_erase(void)
     EN25QXXX_wait_busy();
 }
 //wait busy
-void EN25QXXX_wait_busy(void)
+static void EN25QXXX_wait_busy(void)
 {
     while((EN25QXXX_read_register() & 0x01) == 0x01) 
         continue;    
 }
 
 //active mode
-void EN25QXXX_active_mode(void)
+static void EN25QXXX_active_mode(void)
 {
     EN25Q_operation.cs(0);
     EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_RELEASE_SLEEP);
@@ -244,39 +245,4 @@ void EN25QXXX_sleep_mode(void)
 void EN25QXXX_baud(uint32_t baud)
 {
     EN25Q_operation.reset_baud(EN25Q_operation.channel,baud);
-}
-
-//在这个文件中，实现对flash的操作
-//使用read，write，clear，close这四个函数实现多种功能
-//open，打开flash,确定使用spi通道。
-//read，实现对flash的读取数据，读取id，读取指定地址的数据，读取status
-//write，实现对flash的写如操作，写入状态，向指定地址写入数据
-//clear，实现擦除操作，sector，chip_erase
-//close，关闭flash
-  
-uint32_t EN25QXXX_read(uint32_t addr,uint8_t *rbuf,uint32_t num)
-{
-    uint32_t ret;
-    
-    ret = EN25QXXX_read_data(addr,rbuf,num);
-    return ret;
-}
-
-uint32_t EN25QXXX_write(uint32_t addr,uint8_t *buf,uint32_t num)
-{
-    uint32_t i = 0;
-    
-    i = EN25QXXX_write_data(addr,buf,num);
-    
-    return i;
-}
-
-void EN25QXXX_clear(uint32_t addr)
-{
-    EN25QXXX_erase_sector(addr);
-}
-
-void EN25QXXX_close(void)
-{
-    EN25QXXX_sleep_mode();
 }
