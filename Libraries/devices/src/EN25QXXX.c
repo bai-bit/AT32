@@ -288,5 +288,5 @@ void EN25QXXX_clear(SPI_Type *SPIx,uint32_t addr,uint8_t cmd)
 
 void EN25QXXX_close(SPI_Type *SPIx)
 {
-	EN25QXXX_sleep_mode(SPIx);
+    EN25QXXX_sleep_mode(SPIx);
 }
