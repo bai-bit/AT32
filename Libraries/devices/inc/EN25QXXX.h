@@ -34,28 +34,10 @@ typedef struct EN25Q_dev_t {
     
 }EN25Q_dev_t;
 
-typedef struct 
-{
-	uint16_t SPI_Transmode;
-	uint16_t SPI_Mode;
-	uint16_t SPI_FrameSize;
-	uint16_t SPI_CPOL;
-	uint16_t SPI_CPHA;
-	uint16_t SPI_NSSSET;
-	uint16_t SPI_MCL;
-	uint16_t SPI_FirstBit;
-	uint16_t SPI_CPOLY;
-}EN25Q_SPIConfig;
-
-extern EN25Q_SPIConfig EN25Q_spi_initstruct;
-
 void EN25Q_module_init(EN25Q_dev_t *opers);
 uint16_t EN25QXXX_init(SPI_Type *SPIx);
-
-
 void EN25Q_module_init(EN25Q_dev_t *operations);
 void EN25QXXX_active_mode(SPI_Type *SPIx);
-
 void EN25QXXX_wait_busy(SPI_Type *SPIx);
 
 uint32_t EN25QXXX_write(SPI_Type *SPIx,uint32_t addr,uint8_t *buf,uint32_t num,uint8_t cmd);
