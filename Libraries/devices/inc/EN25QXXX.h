@@ -3,6 +3,7 @@
 #include<at32f4xx.h>
 #include<stdlib.h>
 #include<string.h>
+#include<stdio.h>
 
 #define SECSIZE              4096
 #define SECNUM               4096
@@ -26,32 +27,30 @@
 typedef enum {ID,STATUS,DATA,SECTOR,CHIP}cmd;
 
 typedef struct EN25Q_dev_t {
-    uint8_t (*msg_que)(SPI_Type *SPIx,uint8_t data);
-   
-    void (*cs)(uint32_t GPIOx,uint16_t Pin,uint8_t num);
-    uint32_t GPIOx;
-    uint16_t Pin;
-    
+    uint8_t channel;
+    uint8_t (*send_data)(uint8_t channel,uint8_t data);
+    void (*reset_baud)(uint8_t channel,uint32_t baud);
+    void (*cs)(uint8_t status);
 }EN25Q_dev_t;
 
 void EN25Q_module_init(EN25Q_dev_t *opers);
-uint16_t EN25QXXX_init(SPI_Type *SPIx);
-void EN25Q_module_init(EN25Q_dev_t *operations);
-void EN25QXXX_active_mode(SPI_Type *SPIx);
-void EN25QXXX_wait_busy(SPI_Type *SPIx);
+uint16_t EN25QXXX_init(void);
+void EN25QXXX_active_mode(void);
+void EN25QXXX_wait_busy(void);
 
-uint32_t EN25QXXX_write(SPI_Type *SPIx,uint32_t addr,uint8_t *buf,uint32_t num,uint8_t cmd);
-void EN25QXXX_write_nocheck(SPI_Type *SPIx,uint32_t addr,u8 *buf,uint32_t bufnum);
-uint32_t EN25QXXX_write_data(SPI_Type *SPIx,uint32_t addr,u8 *buf,uint32_t bufnum);
-void EN25QXXX_write_page(SPI_Type *SPIx,const uint32_t addr,u8 *buf,uint16_t bufnum);
+uint32_t EN25QXXX_write(uint32_t addr,uint8_t *buf,uint32_t num);
+void EN25QXXX_write_nocheck(uint32_t addr,uint8_t *buf,uint32_t bufnum);
+uint32_t EN25QXXX_write_data(uint32_t addr,uint8_t *buf,uint32_t bufnum);
+uint32_t EN25QXXX_write_page(uint32_t addr,uint8_t *buf,uint32_t bufnum);
 
-uint32_t EN25QXXX_read(SPI_Type *SPIx,uint32_t addr,uint8_t *rbuf,uint32_t num,uint8_t cmd);
-uint16_t EN25QXXX_readID(SPI_Type *SPIx);
-uint32_t EN25QXXX_read_data(SPI_Type *SPIx,const uint32_t addr,u8 *buf,uint32_t num);
-uint8_t EN25QXXX_read_register(SPI_Type *SPIx);
+uint32_t EN25QXXX_read(uint32_t addr,uint8_t *rbuf,uint32_t num);
+uint16_t EN25QXXX_readID(void);
+uint32_t EN25QXXX_read_data(uint32_t addr,uint8_t *buf,uint32_t bufnum);
+uint8_t EN25QXXX_read_register(void);
 
-void EN25QXXX_clear(SPI_Type *SPIx,uint32_t addr,uint8_t cmd);
-void EN25QXXX_erase_sector(SPI_Type *SPIx,const uint32_t addr);
-void EN25QXXX_close(SPI_Type *SPIx);
-void EN25QXXX_sleep_mode(SPI_Type *SPIx);
+void EN25QXXX_clear(uint32_t addr);
+void EN25QXXX_erase_sector(const uint32_t addr);
+void EN25QXXX_close(void);
+void EN25QXXX_sleep_mode(void);
+void EN25QXXX_baud(uint32_t baud);
 #endif

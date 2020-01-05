@@ -4,20 +4,22 @@
 #include<at32f4xx.h>
 #include<string.h>
 
+#define SECSIZE     4096
+#define PAGESIZE    256
 typedef struct spi_flash_dev_t {
-    void (*init)(SPI_Type *SPIx,void *SPI_InitStruct);
-	uint16_t (*open)(SPI_Type *SPIx);
-	uint32_t (*read)(SPI_Type *SPIx,uint32_t addr,uint8_t *buf,uint32_t bufnum,uint8_t cmd);
-	uint32_t (*write)(SPI_Type *SPIx,uint32_t addr,uint8_t *buf,uint32_t bufnum);
-	void (*clear)(SPI_Type *SPIx,uint32_t addr,uint8_t cmd);
-	void (*release)(SPI_Type *SPIx);
-    void (*resetbaud)(SPI_Type *SPIx,uint32_t baud);
+    uint16_t (*open)(void);
+	uint32_t (*read)(uint32_t addr,uint8_t *buf,uint32_t bufnum);
+	uint32_t (*write)(uint32_t addr,uint8_t *buf,uint32_t bufnum);
+	void (*clear)(uint32_t addr);
+	void (*release)(void);
+    void (*resetbaud)(uint32_t baud);
+    
 }spi_flash_dev_t;
 
-uint16_t spi_flash_open(SPI_Type *SPIx,spi_flash_dev_t *operation);
-uint32_t spi_flash_read(SPI_Type *SPIx,uint32_t addr,uint8_t *buf,uint32_t bufnum,uint8_t cmd);
-uint32_t spi_flash_write(SPI_Type *SPIx,uint32_t addr,uint8_t *buf,uint32_t bufnum,uint8_t cmd);
+uint16_t spi_flash_open(spi_flash_dev_t *operation);
+uint32_t spi_flash_read(uint32_t addr,uint8_t *buf,uint32_t bufnum);
+uint32_t spi_flash_write(uint32_t addr,uint8_t *buf,uint32_t bufnum);
 
-void spi_flash_clear(SPI_Type *SPIx,uint32_t addr,uint8_t cmd);
+void spi_flash_clear(uint32_t addr);
 
 #endif
