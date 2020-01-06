@@ -49,26 +49,26 @@ void spi_flash_module_init(spi_flash_dev_t *operation)
 uint16_t spi_flash_open(void)
 {
 	//由设备端调用，初始化spi，获取设备的id号
-	uint16_t device_id;
+    uint16_t device_id;
 		
-	device_id = operas.open();
+    device_id = operas.open();
     operas.device_id = device_id;
-	
-	return device_id;
+    
+    return device_id;
 }
 
 uint32_t spi_flash_read(uint32_t addr,uint8_t *buf,uint32_t bufnum)
 {
-	//由设备端调用，读取设备的储存数据
-	uint32_t i = 0;
-	i = operas.read(addr,buf,bufnum);
-	
-	return i;
+    //由设备端调用，读取设备的储存数据
+    uint32_t i = 0;
+    i = operas.read(addr,buf,bufnum);
+    
+    return i;
 }
 
 uint32_t spi_flash_write(uint32_t addr,uint8_t *buf,uint32_t bufnum)
 {
-	//有设备端调用，向设备写入数据
+    //有设备端调用，向设备写入数据
     //读改写
     uint32_t i = 0;
     spi_flash_erase(addr / SECSIZE * SECSIZE);
