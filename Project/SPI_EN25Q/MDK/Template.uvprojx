@@ -440,13 +440,6 @@
         </Group>
         <Group>
           <GroupName>device</GroupName>
-          <Files>
-            <File>
-              <FileName>EN25QXXX.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\devices\src\EN25QXXX.c</FilePath>
-            </File>
-          </Files>
         </Group>
       </Groups>
     </Target>

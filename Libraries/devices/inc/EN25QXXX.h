@@ -1,9 +1,8 @@
 #ifndef __EN25QXXX_H
 #define __EN25QXXX_H
-#include<at32f4xx.h>
-#include<stdlib.h>
+
 #include<string.h>
-#include<stdio.h>
+#include<stdint.h>
 
 #define SECSIZE              4096
 #define SECNUM               4096
@@ -24,12 +23,13 @@
 #define EN25Q_64K_ERASE      0x08
 #define EN25Q_CHIP_ERASE     0x60
 #define EN25Q_BASE           0X02
+
 typedef enum {ID,STATUS,DATA,SECTOR,CHIP}cmd;
 
 typedef struct EN25Q_dev_t {
     uint8_t channel;
-    uint8_t (*send_data)(uint8_t channel,uint8_t data);
-    void (*reset_baud)(uint8_t channel,uint32_t baud);
+    uint8_t (*xfer_data)(uint8_t data);
+    
     void (*cs)(uint8_t status);
 }EN25Q_dev_t;
 
@@ -42,11 +42,11 @@ void EN25QXXX_write_nocheck(uint32_t addr,uint8_t *buf,uint32_t bufnum);
 uint32_t EN25QXXX_write_data(uint32_t addr,uint8_t *buf,uint32_t bufnum);
 uint32_t EN25QXXX_write_page(uint32_t addr,uint8_t *buf,uint32_t bufnum);
 
-uint16_t EN25QXXX_readID(void);
+uint16_t EN25QXXX_read_id(void);
 uint32_t EN25QXXX_read_data(uint32_t addr,uint8_t *buf,uint32_t bufnum);
 static uint8_t EN25QXXX_read_register(void);
 
 void EN25QXXX_erase_sector(const uint32_t addr);
 void EN25QXXX_sleep_mode(void);
-void EN25QXXX_baud(uint32_t baud);
+
 #endif

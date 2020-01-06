@@ -13,12 +13,12 @@ uint16_t EN25QXXX_init(void)
     uint16_t EN25Q_ID = 0;
     
     EN25QXXX_active_mode();
-    EN25Q_ID |= EN25QXXX_readID();
+    EN25Q_ID |= EN25QXXX_read_id();
     return EN25Q_ID;
 }
 
 
-uint16_t EN25QXXX_readID(void)
+uint16_t EN25QXXX_read_id(void)
 {
     //chip select low
     //send read instruction
@@ -27,12 +27,12 @@ uint16_t EN25QXXX_readID(void)
     uint16_t ret = 0;
 
     EN25Q_operation.cs(0);
-    EN25Q_operation.send_data(EN25Q_operation.channel,READ_DEVICE_ID);
-    EN25Q_operation.send_data(EN25Q_operation.channel,0x00);
-    EN25Q_operation.send_data(EN25Q_operation.channel,0x00);
-    EN25Q_operation.send_data(EN25Q_operation.channel,0x00);
-    ret |= EN25Q_operation.send_data(EN25Q_operation.channel,SEND_DEFAULT_VALUE) << 8;
-    ret |= EN25Q_operation.send_data(EN25Q_operation.channel,SEND_DEFAULT_VALUE);
+    EN25Q_operation.xfer_data(READ_DEVICE_ID);
+    EN25Q_operation.xfer_data(0x00);
+    EN25Q_operation.xfer_data(0x00);
+    EN25Q_operation.xfer_data(0x00);
+    ret |= EN25Q_operation.xfer_data(SEND_DEFAULT_VALUE) << 8;
+    ret |= EN25Q_operation.xfer_data(SEND_DEFAULT_VALUE);
     EN25Q_operation.cs(1);
     
     return ret;
@@ -40,20 +40,20 @@ uint16_t EN25QXXX_readID(void)
 
 
 //read data for en25q
-uint32_t EN25QXXX_read_data(uint32_t addr,uint8_t *rbuf,uint32_t bufnum)
+uint32_t EN25QXXX_read_data(uint32_t addr, uint8_t *rbuf, uint32_t bufnum)
 {
     //读ID,读status,读data
     uint32_t i = 0;
     
     EN25Q_operation.cs(0);
 	
-    EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_FAST_READ);
-    EN25Q_operation.send_data(EN25Q_operation.channel,(uint8_t)((addr) >> 16));
-    EN25Q_operation.send_data(EN25Q_operation.channel,(uint8_t)((addr) >> 8));
-    EN25Q_operation.send_data(EN25Q_operation.channel,(uint8_t)(addr));
+    EN25Q_operation.xfer_data(EN25Q_FAST_READ);
+    EN25Q_operation.xfer_data((uint8_t)((addr) >> 16));
+    EN25Q_operation.xfer_data((uint8_t)((addr) >> 8));
+    EN25Q_operation.xfer_data((uint8_t)(addr));
     
     for(i = 0;i < bufnum;i++)
-        rbuf[i] = EN25Q_operation.send_data(EN25Q_operation.channel,SEND_DEFAULT_VALUE);
+        rbuf[i] = EN25Q_operation.xfer_data(SEND_DEFAULT_VALUE);
     
     EN25Q_operation.cs(1);
     return sizeof(rbuf);
@@ -65,8 +65,8 @@ static uint8_t EN25QXXX_read_register(void)
     
     EN25Q_operation.cs(0);
     
-    EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_READ_STATUS);
-    status = EN25Q_operation.send_data(EN25Q_operation.channel,SEND_DEFAULT_VALUE);
+    EN25Q_operation.xfer_data(EN25Q_READ_STATUS);
+    status = EN25Q_operation.xfer_data(SEND_DEFAULT_VALUE);
     
     EN25Q_operation.cs(1);
     
@@ -76,14 +76,14 @@ static uint8_t EN25QXXX_read_register(void)
 static void EN25QXXX_write_enable(void)
 {
     EN25Q_operation.cs(0);
-    EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_WRITE_ENABLE);
+    EN25Q_operation.xfer_data(EN25Q_WRITE_ENABLE);
     EN25Q_operation.cs(1);    
 }
 //write disable
 static void EN25QXXX_write_disable(void)
 {
     EN25Q_operation.cs(0);
-    EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_WRITE_DISABLE);
+    EN25Q_operation.xfer_data(EN25Q_WRITE_DISABLE);
     EN25Q_operation.cs(1);    
 }
 //write data to en25q
@@ -153,43 +153,43 @@ uint32_t EN25QXXX_write_page(uint32_t addr,uint8_t *buf,uint32_t bufnum)
     EN25QXXX_wait_busy();
     
     EN25Q_operation.cs(0);
-    EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_PAGE_PROGRAM);
-    EN25Q_operation.send_data(EN25Q_operation.channel,(uint8_t)((addr) >> 16));
-    EN25Q_operation.send_data(EN25Q_operation.channel,(uint8_t)((addr) >> 8));
-    EN25Q_operation.send_data(EN25Q_operation.channel,(uint8_t)(addr));
+    EN25Q_operation.xfer_data(EN25Q_PAGE_PROGRAM);
+    EN25Q_operation.xfer_data((uint8_t)((addr) >> 16));
+    EN25Q_operation.xfer_data((uint8_t)((addr) >> 8));
+    EN25Q_operation.xfer_data((uint8_t)(addr));
     
     for(i = 0;i < bufnum;i++)
-        EN25Q_operation.send_data(EN25Q_operation.channel,buf[i]);
+        EN25Q_operation.xfer_data(buf[i]);
     
     EN25Q_operation.cs(1);
     EN25QXXX_wait_busy();
     return i;
 }
 
-void EN25QXXX_write_nocheck(uint32_t addr,uint8_t *buf,uint32_t bufnum)
-{
-    //检查写入的地址，在某一个页内的偏移地址
-    //比较页内剩余空间和实际写入的字节数，决定传递的参数
-    //如果实际写入的字节数在一个页内写不完，就重复调用写入函数，前提是将每次传递的参数处理好
-    uint32_t pagesurplus = 0;
-    
-    pagesurplus = PAGESIZE - ((addr) % PAGESIZE);
-    if(pagesurplus >= bufnum)
-        pagesurplus = bufnum;
-    EN25QXXX_write_page((addr),buf,pagesurplus);
-    while(pagesurplus < bufnum)
-    {
-        buf = buf + pagesurplus;
-        addr = (addr) + pagesurplus;
-        bufnum = bufnum - pagesurplus;
-        if(bufnum >= PAGESIZE)
-            pagesurplus = PAGESIZE;
-        else
-            pagesurplus = bufnum;
-		
-        EN25QXXX_write_page((addr),buf,pagesurplus);
-    }
-}
+//void EN25QXXX_write_nocheck(uint32_t addr,uint8_t *buf,uint32_t bufnum)
+//{
+//    //检查写入的地址，在某一个页内的偏移地址
+//    //比较页内剩余空间和实际写入的字节数，决定传递的参数
+//    //如果实际写入的字节数在一个页内写不完，就重复调用写入函数，前提是将每次传递的参数处理好
+//    uint32_t pagesurplus = 0;
+//    
+//    pagesurplus = PAGESIZE - ((addr) % PAGESIZE);
+//    if(pagesurplus >= bufnum)
+//        pagesurplus = bufnum;
+//    EN25QXXX_write_page((addr),buf,pagesurplus);
+//    while(pagesurplus < bufnum)
+//    {
+//        buf = buf + pagesurplus;
+//        addr = (addr) + pagesurplus;
+//        bufnum = bufnum - pagesurplus;
+//        if(bufnum >= PAGESIZE)
+//            pagesurplus = PAGESIZE;
+//        else
+//            pagesurplus = bufnum;
+//		
+//        EN25QXXX_write_page((addr),buf,pagesurplus);
+//    }
+//}
 
 void EN25QXXX_erase_sector(const uint32_t addr)
 {
@@ -200,10 +200,10 @@ void EN25QXXX_erase_sector(const uint32_t addr)
     
     EN25Q_operation.cs(0);
     
-    EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_SECTOR_ERASE);
-    EN25Q_operation.send_data(EN25Q_operation.channel,(uint8_t)((temp) >> 16));
-    EN25Q_operation.send_data(EN25Q_operation.channel,(uint8_t)((temp) >> 8));
-    EN25Q_operation.send_data(EN25Q_operation.channel,(uint8_t)(temp));
+    EN25Q_operation.xfer_data(EN25Q_SECTOR_ERASE);
+    EN25Q_operation.xfer_data((uint8_t)((temp) >> 16));
+    EN25Q_operation.xfer_data((uint8_t)((temp) >> 8));
+    EN25Q_operation.xfer_data((uint8_t)(temp));
     
     EN25Q_operation.cs(1);  
     
@@ -216,7 +216,7 @@ void EN25QXXX_chip_erase(void)
     EN25QXXX_wait_busy();
     
     EN25Q_operation.cs(0);
-    EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_CHIP_ERASE);
+    EN25Q_operation.xfer_data(EN25Q_CHIP_ERASE);
     EN25Q_operation.cs(1);
     EN25QXXX_wait_busy();
 }
@@ -231,7 +231,7 @@ static void EN25QXXX_wait_busy(void)
 static void EN25QXXX_active_mode(void)
 {
     EN25Q_operation.cs(0);
-    EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_RELEASE_SLEEP);
+    EN25Q_operation.xfer_data(EN25Q_RELEASE_SLEEP);
     EN25Q_operation.cs(1);
 }
 
@@ -239,10 +239,7 @@ static void EN25QXXX_active_mode(void)
 void EN25QXXX_sleep_mode(void)
 {
     EN25Q_operation.cs(0);
-    EN25Q_operation.send_data(EN25Q_operation.channel,EN25Q_DEEP_POWER);
+    EN25Q_operation.xfer_data(EN25Q_DEEP_POWER);
     EN25Q_operation.cs(1);
 }
-void EN25QXXX_baud(uint32_t baud)
-{
-    EN25Q_operation.reset_baud(EN25Q_operation.channel,baud);
-}
+
