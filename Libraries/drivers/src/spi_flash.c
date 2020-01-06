@@ -48,7 +48,7 @@ void spi_flash_module_init(spi_flash_dev_t *operation)
 }
 uint16_t spi_flash_open(void)
 {
-	//由设备端调用，初始化spi，获取设备的id号
+    //由设备端调用，初始化spi，获取设备的id号
     uint16_t device_id;
 		
     device_id = operas.open();
