@@ -24,12 +24,12 @@ static uint16_t EN25QXXX_init(void);
 static void EN25QXXX_active_mode(void);
 static void EN25QXXX_wait_busy(void);
 
-//static void EN25QXXX_write_nocheck(uint32_t addr,uint8_t *buf,uint32_t bufnum);
-//static uint32_t EN25QXXX_write_data(uint32_t addr,uint8_t *buf,uint32_t bufnum);
-static uint32_t EN25QXXX_write_page(uint32_t addr,uint8_t *buf,uint32_t bufnum);
+//static void EN25QXXX_write_nocheck(uint32_t addr, uint8_t *buf, uint32_t bufnum);
+//static uint32_t EN25QXXX_write_data(uint32_t addr, uint8_t *buf, uint32_t bufnum);
+static uint32_t EN25QXXX_write_page(uint32_t addr, uint8_t *buf, uint32_t bufnum);
 
 static uint16_t EN25QXXX_read_id(void);
-static uint32_t EN25QXXX_read_data(uint32_t addr,uint8_t *buf,uint32_t bufnum);
+static uint32_t EN25QXXX_read_data(uint32_t addr, uint8_t *buf, uint32_t bufnum);
 static uint8_t EN25QXXX_read_register(void);
 
 static void EN25QXXX_erase_sector(const uint32_t addr);
@@ -57,7 +57,7 @@ uint16_t spi_flash_open(void)
     return device_id;
 }
 
-uint32_t spi_flash_read(uint32_t addr,uint8_t *buf,uint32_t bufnum)
+uint32_t spi_flash_read(uint32_t addr, uint8_t *buf, uint32_t bufnum)
 {
     //由设备端调用，读取设备的储存数据
     uint32_t i = 0;
@@ -66,7 +66,7 @@ uint32_t spi_flash_read(uint32_t addr,uint8_t *buf,uint32_t bufnum)
     return i;
 }
 
-uint32_t spi_flash_write(uint32_t addr,uint8_t *buf,uint32_t bufnum)
+uint32_t spi_flash_write(uint32_t addr, uint8_t *buf, uint32_t bufnum)
 {
     //有设备端调用，向设备写入数据
     //读改写
@@ -180,7 +180,7 @@ static void EN25QXXX_write_disable(void)
 }
 //write data to en25q
 //uint8_t secbuf[SECSIZE];
-//static uint32_t EN25QXXX_write_data(uint32_t addr,uint8_t *buf,uint32_t bufnum)
+//static uint32_t EN25QXXX_write_data(uint32_t addr, uint8_t *buf, uint32_t bufnum)
 //{
 //    uint32_t m = 0;
 //    uint32_t sectorid = 0,secoffset = 0,secsurplus = 0;
@@ -237,7 +237,7 @@ static void EN25QXXX_write_disable(void)
 //}
 
 //256 or >256
-static uint32_t EN25QXXX_write_page(uint32_t addr,uint8_t *buf,uint32_t bufnum)
+static uint32_t EN25QXXX_write_page(uint32_t addr, uint8_t *buf, uint32_t bufnum)
 {
     uint16_t i;
     
@@ -258,7 +258,7 @@ static uint32_t EN25QXXX_write_page(uint32_t addr,uint8_t *buf,uint32_t bufnum)
     return i;
 }
 
-//void EN25QXXX_write_nocheck(uint32_t addr,uint8_t *buf,uint32_t bufnum)
+//void EN25QXXX_write_nocheck(uint32_t addr, uint8_t *buf, uint32_t bufnum)
 //{
 //    //检查写入的地址，在某一个页内的偏移地址
 //    //比较页内剩余空间和实际写入的字节数，决定传递的参数

@@ -46,18 +46,18 @@ typedef struct
 }SPI_InitType;
 extern SPI_Type *SPI_list[];
 
-void spi_init(uint8_t SPIx,uint32_t baud);
-FlagStatus spi_GetFlagStatus(uint8_t SPIx,uint16_t SPI_FLAG);
+void spi_init(uint8_t SPIx, uint32_t baud);
+FlagStatus spi_GetFlagStatus(uint8_t SPIx, uint16_t SPI_FLAG);
 
-void spi_cmd(uint8_t SPIx,FunctionalState status);
-void spi_senddata(uint8_t SPIx,u8 data);
-u8 spi_receivedata(uint8_t SPIx);
-u8 spi_RWdata(uint8_t SPIx,u8 data);
+void spi_cmd(uint8_t SPIx, FunctionalState status);
+void spi_senddata(uint8_t SPIx, uint8_t data);
+uint8_t spi_receivedata(uint8_t SPIx);
+uint8_t spi_RWdata(uint8_t SPIx, uint8_t data);
 
-void spi_resetTR(uint8_t SPIx,uint8_t mode);
-void spi_resetMode(uint8_t SPIx,uint8_t mode);
-void spi_resetbaud(uint8_t SPIx,uint32_t baud);
-void spi_resetTransmode(uint8_t SPIx,uint8_t Transmode);
-void spi_resetFirstBits(uint8_t SPIx,uint8_t FirstBits);
+void spi_resetTR(uint8_t SPIx, uint8_t mode);
+void spi_resetMode(uint8_t SPIx, uint8_t mode);
+void spi_resetbaud(uint8_t SPIx, uint32_t baud);
+void spi_resetTransmode(uint8_t SPIx, uint8_t Transmode);
+void spi_resetFirstBits(uint8_t SPIx, uint8_t FirstBits);
 
 #endif
