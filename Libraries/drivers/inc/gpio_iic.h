@@ -12,14 +12,14 @@
 #define IIC_SDA    PBout(9) 	 
 #define READ_SDA   PBin(9)   
 
-void iic_init(void);
-void iic_start(void);
-void iic_stop(void);
-uint8_t iic_wait_ack(void);
-void iic_ack(void);
-void iic_notack(void);
-void iic_send_data(uint8_t data);
-uint8_t iic_receive_data(uint8_t ack);
+void IIC_Init(void);
+void IIC_Start(void);
+void IIC_Stop(void);
+uint8_t IIC_WaitAck(void);
+void IIC_Ack(void);
+void IIC_NotAck(void);
+void IIC_SendData(uint8_t data);
+uint8_t IIC_ReceiveData(uint8_t ack);
 
 
 

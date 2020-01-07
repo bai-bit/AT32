@@ -1,8 +1,9 @@
 #ifndef __AUTO_UART_BAUD_H
 #define __AUTO_UART_BAUD_H
-#include<at32f4xx.h>
-#include<gpio_init.h>
-#include<exti.h>
+#include "at32f4xx.h"
+#include "gpio_init.h"
+#include "exti.h"
+#include "uart.h"
 
 #define SIZE          8
 #define BYTE_Mask     9

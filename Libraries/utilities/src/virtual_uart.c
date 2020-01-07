@@ -8,11 +8,11 @@ void uart1_io_config(void)
 	//配置AFIO,EXTIC的寄存器，外部中断输入源
 	//初始化外部中断
 	//使能外部中断
-	GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Speed_50MHz, GPIO_Mode_Out_PP);
+	GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_Out_PP);
 	
-	GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Speed_INNO, GPIO_Mode_IN_FLOATING);
+	GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Mode_IN_FLOATING);
 	AFIO_Init(HW_GPIOA, GPIO_PIN_10);
-	exti_init(exti_line10, interrupt, failling, ENABLE);
+	Exti_Init(exti_line10, interrupt, failling, ENABLE);
 	NVIC_Init(EXTI15_10_IRQn, 2, 3, ENABLE);
 }
 
@@ -130,7 +130,7 @@ void EXTI15_10_IRQHandler(void)
 {
 	//判断中断线
 	uint8_t ret;
-	if(get_extiinter(exti_line10) == SET)
+	if(Get_ExtiInter(exti_line10) == SET)
 	{
 		//读数据
 		//判断发送结束标志
@@ -156,6 +156,6 @@ void EXTI15_10_IRQHandler(void)
 					uart_read_status = RESET;
 			}
 		}
-		clean_extiinter(exti_line10);
+		Clean_ExtiInter(exti_line10);
 	}
 }

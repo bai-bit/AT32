@@ -1,8 +1,9 @@
-#include<systemclk.h>
-#include<uart.h>
-#include<spi_flash.h>
-#include<spi.h>
-#include<gpio_init.h>
+#include"systemclk.h"
+#include"uart.h"
+#include"spi_flash.h"
+#include"spi.h"
+#include"gpio_init.h"
+#include"common.h"
 #define SIZE 64
 #define TEST_ADDR 0x001000
 static uint8_t SPIx;
@@ -10,14 +11,14 @@ uint8_t ctl_data(uint8_t data);
 void ctl_cs(uint8_t status);
 void flash_board_module_init(void);
 
-EN25Q_dev_t EN25Q_ops = {
+spi_flash_dev_t spi_flash_ops = {
     .xfer_data = ctl_data,
     .cs = ctl_cs
 };
 
 int main(int argc,const char *argv[])
 {
-    sysclk_PLLEN(PLLCLK_MUL_192MHz);
+    SysClk_PLLEN(PLLCLK_MUL_192MHz);
     uint8_t buf[SIZE] = "hello world,welcome to nowyork";  
     uint8_t rbuf[SIZE] = "";
     uint16_t i = 0;
@@ -55,14 +56,14 @@ void flash_board_module_init(void)
     GPIO_Init(HW_GPIOA, GPIO_PIN_4, GPIO_Mode_Out_PP);
     GPIO_PinWrite(HW_GPIOA, GPIO_PIN_4, 1);
    
-    spi_init(HW_SPI1, SPI_BAUDRATE_64);
-    spi_resetTR(HW_SPI1, MODE3);
-    EN25Q_module_init(&EN25Q_ops);
+    SPI_Init(HW_SPI1, SPI_BAUDRATE_64);
+    SPI_SetTR(HW_SPI1, MODE3);
+    spi_flash_init(&spi_flash_ops);
 }
 
 uint8_t ctl_data(uint8_t data)
 {
-    return spi_RWdata(SPIx, data);
+    return SPI_TransferData(SPIx, data);
 }
 void ctl_cs(uint8_t status)
 {

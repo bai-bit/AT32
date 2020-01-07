@@ -45,7 +45,7 @@ void DelayInit(void);
 void systick_setexception(bool val);
 void delayms(uint32_t num);
 void delayus(uint32_t num);
-uint32_t getclock_frequency(CLOCKFRE_t clock);
+uint32_t GetClock_Frequency(CLOCKFRE_t clock);
 
 void NVIC_PriorityGroupConfig(uint32_t NVIC_PriorityGroup);
 void NVIC_Init(uint8_t NVIC_IRQChannel,uint8_t PreemptionPriority,uint8_t SubPriority,FunctionalState NewState);

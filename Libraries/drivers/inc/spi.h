@@ -1,13 +1,7 @@
 #ifndef __SPI_H
 #define __SPI_H
-#include<at32f4xx.h>
+#include"at32f4xx.h"
 #include<stdio.h>
-
-#define SPI_CR1_Mask            (0xE9F3)
-#define SPI_MODE_SEL            0xF7FF
-
-#define SPI_Flag_TX             0x0002
-#define SPI_Flag_BSY            (1 << 7)
 
 #define SPI_BAUDRATEMask        0xFFC7
 #define SPI_BAUDRATE_2          0x0000
@@ -21,12 +15,10 @@
 #define SPI_BAUDRATE_512        0x0100
 #define SPI_BAUDRATE_1024       0x0108
 
-#define SPI_CPOLY_RESET         0x0007
-
-#define MODE0                   0
-#define MODE1                   1
-#define MODE2                   2
-#define MODE3                   3
+#define MODE0                   (0)
+#define MODE1                   (1)
+#define MODE2                   (2)
+#define MODE3                   (3)
 #define HW_SPI1                 (0)
 #define HW_SPI2                 (1)
 #define HW_SPI3                 (2)
@@ -46,18 +38,18 @@ typedef struct
 }SPI_InitType;
 extern SPI_Type *SPI_list[];
 
-void spi_init(uint8_t SPIx, uint32_t baud);
-FlagStatus spi_GetFlagStatus(uint8_t SPIx, uint16_t SPI_FLAG);
+void SPI_Init(uint8_t SPIx, uint32_t baud);
+FlagStatus SPI_GetFlagStatus(uint8_t SPIx, uint16_t SPI_FLAG);
 
-void spi_cmd(uint8_t SPIx, FunctionalState status);
-void spi_senddata(uint8_t SPIx, uint8_t data);
-uint8_t spi_receivedata(uint8_t SPIx);
-uint8_t spi_RWdata(uint8_t SPIx, uint8_t data);
+void SPI_Cmd(uint8_t SPIx, FunctionalState status);
+void SPI_SendData(uint8_t SPIx, uint8_t data);
+uint8_t SPI_ReceiveData(uint8_t SPIx);
+uint8_t SPI_TransferData(uint8_t SPIx, uint8_t data);
 
-void spi_resetTR(uint8_t SPIx, uint8_t mode);
-void spi_resetMode(uint8_t SPIx, uint8_t mode);
-void spi_resetbaud(uint8_t SPIx, uint32_t baud);
-void spi_resetTransmode(uint8_t SPIx, uint8_t Transmode);
-void spi_resetFirstBits(uint8_t SPIx, uint8_t FirstBits);
+void SPI_SetTR(uint8_t SPIx, uint8_t mode);
+void SPI_SetMode(uint8_t SPIx, uint8_t mode);
+void SPI_SetBaud(uint8_t SPIx, uint32_t baud);
+void SPI_SetTransMode(uint8_t SPIx, uint8_t Transmode);
+void SPI_SetFirstBits(uint8_t SPIx, uint8_t FirstBits);
 
 #endif

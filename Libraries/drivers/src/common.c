@@ -13,7 +13,7 @@ void DelayInit(void)
     //³õÊ¼»¯fac_ms,fac_us.
     SysTick->CTRL &= ~(SysTick_CTRL_CLKSOURCE_Msk);
     
-    fac_us = (float)getclock_frequency(pll) / 8000000;
+    fac_us = (float)GetClock_Frequency(pll) / 8000000;
     fac_ms = fac_us * 1000;
 }
 
@@ -68,7 +68,7 @@ void systick_setexception(bool val)
     val == true ? (SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk) : (SysTick->CTRL &= ~(SysTick_CTRL_TICKINT_Msk)); 
 }
 
-uint32_t getclock_frequency(CLOCKFRE_t clock)
+uint32_t GetClock_Frequency(CLOCKFRE_t clock)
 {
     uint32_t value = 0, ahb_div = 0, apb1_div = 0, apb2_div = 0;
     uint32_t pll_frafremask = 0, pll_frafreval = 0, pll_value = 0, pll_value1 = 0, pll_value2 = 0;

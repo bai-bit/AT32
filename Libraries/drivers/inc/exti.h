@@ -24,10 +24,9 @@ typedef enum {interrupt,event} EXTI_MODE;
 
 typedef enum {failling,rising,failling_and_rising} TRIGGER_MODE;
 
-FlagStatus get_extiinter(uint32_t exti_line);
-void clean_extiinter(uint32_t exti_line);
+FlagStatus Get_ExtiInter(uint32_t exti_line);
+void Clean_ExtiInter(uint32_t exti_line);
 
-void uart1_io_config(void);
-void exti_init(uint32_t exti_line,EXTI_MODE exti_mode,TRIGGER_MODE trigger_mode,FunctionalState NewStatus);
+void Exti_Init(uint32_t exti_line,EXTI_MODE exti_mode,TRIGGER_MODE trigger_mode,FunctionalState NewStatus);
 
 #endif

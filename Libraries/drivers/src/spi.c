@@ -1,12 +1,18 @@
-#include<spi.h>
+#include<SPI.h>
+
+#define SPI_CPOLY_RESET         (0x0007)
+#define SPI_CR1_Mask            (0xE9F3)
+#define SPI_MODE_SEL            (0xF7FF)
+
 SPI_Type *SPI_list[] = {SPI1,SPI2,SPI3,SPI4};
-void spi_init(uint8_t SPIx, uint32_t baud)
+
+void SPI_Init(uint8_t SPIx, uint32_t baud)
 {
     //首先配置为缺省值。全是0
 	//然后根据自己的需要配寄存器
 	//配置的内容：数据的传输方向，全双工，8位数据帧，lsb的格式帧，分频系数256，主机模式，cpol = 0，cpha = 1，nss值，crc
-	//使能spi的时钟
-	//最后使能spi
+	//使能SPI的时钟
+	//最后使能SPI
     if(SPIx == HW_SPI1)
         RCC->APB2EN |= RCC_APB2EN_SPI1EN;
     else if(SPIx == HW_SPI2)
@@ -25,23 +31,23 @@ void spi_init(uint8_t SPIx, uint32_t baud)
     SPI_list[SPIx]->I2SCTRL &= SPI_MODE_SEL;
     SPI_list[SPIx]->CPOLY = SPI_CPOLY_RESET;
     
-    spi_cmd(SPIx, ENABLE);
+    SPI_Cmd(SPIx, ENABLE);
 }
-void spi_resetMode(uint8_t SPIx, uint8_t mode)
+void SPI_SetMode(uint8_t SPIx, uint8_t mode)
 {
     //MSTEN
-    while(spi_GetFlagStatus(SPIx, SPI_Flag_BSY) == SET)
+    while(SPI_GetFlagStatus(SPIx, SPI_STS_BSY) == SET)
         continue;
-    spi_cmd(SPIx,DISABLE);
+    SPI_Cmd(SPIx,DISABLE);
     SPI_list[SPIx]->CTRL1 &= ~(SPI_CTRL1_MSTEN);
     SPI_list[SPIx]->CTRL1 |= mode;
-    spi_cmd(SPIx,ENABLE);
+    SPI_Cmd(SPIx,ENABLE);
 }
-void spi_resetTR(uint8_t SPIx, uint8_t mode)
+void SPI_SetTR(uint8_t SPIx, uint8_t mode)
 {
-    while(spi_GetFlagStatus(SPIx, SPI_Flag_BSY) == SET)
+    while(SPI_GetFlagStatus(SPIx, SPI_STS_BSY) == SET)
         continue;
-    spi_cmd(SPIx,DISABLE);
+    SPI_Cmd(SPIx,DISABLE);
     SPI_list[SPIx]->CTRL1 &= ~(SPI_CTRL1_CPHA | SPI_CTRL1_CPOL);
     switch(mode)
     {
@@ -60,27 +66,27 @@ void spi_resetTR(uint8_t SPIx, uint8_t mode)
             printf("reset TR error");
     }
  
-    spi_cmd(SPIx,ENABLE);
+    SPI_Cmd(SPIx,ENABLE);
 }
-void spi_resetTransmode(uint8_t SPIx, uint8_t Transmode)
+void SPI_SetTransMode(uint8_t SPIx, uint8_t transmode)
 {
-    while(spi_GetFlagStatus(SPIx, SPI_Flag_BSY) == SET)
+    while(SPI_GetFlagStatus(SPIx, SPI_STS_BSY) == SET)
         continue;
-    spi_cmd(SPIx,DISABLE);
+    SPI_Cmd(SPIx,DISABLE);
     SPI_list[SPIx]->CTRL1 &=~(SPI_CTRL1_LSBEN);
-    SPI_list[SPIx]->CTRL1 |= Transmode;
-    spi_cmd(SPIx,ENABLE);
+    SPI_list[SPIx]->CTRL1 |= transmode;
+    SPI_Cmd(SPIx,ENABLE);
 }
-void spi_resetFirstBits(uint8_t SPIx, uint8_t FirstBits)
+void SPI_resetFirstBits(uint8_t SPIx, uint8_t first_bits)
 {
-    while(spi_GetFlagStatus(SPIx, SPI_Flag_BSY) == SET)
+    while(SPI_GetFlagStatus(SPIx, SPI_STS_BSY) == SET)
         continue;
-    spi_cmd(SPIx,DISABLE);
+    SPI_Cmd(SPIx,DISABLE);
     SPI_list[SPIx]->CTRL1 &= ~(SPI_CTRL1_DFF16);
-    SPI_list[SPIx]->CTRL1 |= FirstBits;
-    spi_cmd(SPIx,ENABLE);
+    SPI_list[SPIx]->CTRL1 |= first_bits;
+    SPI_Cmd(SPIx,ENABLE);
 }
-void spi_cmd(uint8_t SPIx, FunctionalState status)
+void SPI_Cmd(uint8_t SPIx, FunctionalState status)
 {
     if(status == ENABLE)
         SPI_list[SPIx]->CTRL1 |= SPI_CTRL1_SPIEN;
@@ -88,20 +94,20 @@ void spi_cmd(uint8_t SPIx, FunctionalState status)
         SPI_list[SPIx]->CTRL1 &= ~SPI_CTRL1_SPIEN;
 }
 
-FlagStatus spi_GetFlagStatus(uint8_t SPIx, uint16_t SPI_FLAG)
+FlagStatus SPI_GetFlagStatus(uint8_t SPIx, uint16_t SPI_flag)
 {
-	if(SPI_list[SPIx]->STS & SPI_FLAG)
+	if(SPI_list[SPIx]->STS & SPI_flag)
 		return SET;
 	else
 		return RESET;
 }
 
 //add baud reset functional achieve
-void spi_resetbaud(uint8_t SPIx, uint32_t baud)
+void SPI_SetBaud(uint8_t SPIx, uint32_t baud)
 {
-    while(spi_GetFlagStatus(SPIx, SPI_Flag_BSY) == SET)
+    while(SPI_GetFlagStatus(SPIx, SPI_STS_BSY) == SET)
         continue;
-    spi_cmd(SPIx,DISABLE);
+    SPI_Cmd(SPIx,DISABLE);
     SPI_list[SPIx]->CTRL1 &= SPI_BAUDRATEMask;
 	if(baud == SPI_BAUDRATE_512 )
 		SPI_list[SPIx]->CTRL2 |= baud;
@@ -112,30 +118,30 @@ void spi_resetbaud(uint8_t SPIx, uint32_t baud)
 	}
 	else
 		SPI_list[SPIx]->CTRL1 |= baud;
-    spi_cmd(SPIx,ENABLE);
+    SPI_Cmd(SPIx,ENABLE);
 }
-//add operation spi->DT register function
-void spi_senddata(uint8_t SPIx, uint8_t data)
+//add operation SPI->DT register function
+void SPI_SendData(uint8_t SPIx, uint8_t data)
 {
     SPI_list[SPIx]->DT = data;
 }
-uint8_t spi_receivedata(uint8_t SPIx)
+uint8_t SPI_ReceiveData(uint8_t SPIx)
 {
     return SPI_list[SPIx]->DT;
 }
-//add spi read_write functional achieve
-uint8_t spi_RWdata(uint8_t SPIx, uint8_t data)
+//add SPI read_write functional achieve
+uint8_t SPI_TransferData(uint8_t SPIx, uint8_t data)
 {
     uint32_t time = 0x10000;
     
-    while(spi_GetFlagStatus(SPIx, SPI_Flag_BSY) == SET && time--)
+    while(SPI_GetFlagStatus(SPIx, SPI_STS_BSY) == SET && time--)
         continue;
     time = 0x10000;
-    spi_senddata(SPIx, data);
-    while(spi_GetFlagStatus(SPIx, SPI_Flag_BSY) == SET && time--)
+    SPI_SendData(SPIx, data);
+    while(SPI_GetFlagStatus(SPIx, SPI_STS_BSY) == SET && time--)
         continue;
     
-    return spi_receivedata(SPIx);
+    return SPI_ReceiveData(SPIx);
 }
 
 

@@ -1,17 +1,20 @@
-#include<uart.h>
-#include<strfunc.h>
-#include<systick.h>
-
+#include "uart.h"
+#include "strfunc.h"
+#include "common.h"
+#include "systemclk.h"
+#include "gpio_init.h"
 
 void SysTick_Handler(void);
 void Reset_Handler(void);
 int main(int argc, const char *argv[])
 {
-	sysclk_PLLEN(PLLCLK_MUL_192MHz);
+	SysClk_PLLEN(PLLCLK_MUL_192MHz);
 	DelayInit();
-	uart1_init(115200);
+    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_AF_PP);
+    GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Mode_IN_FLOATING);
+	UART_Init(HW_USART1, BAUD_115200);
 	systick_setexception(true);
-	SysTick->LOAD = (float)getclock_frequency(pll) / 80000;
+	SysTick->LOAD = (float)GetClock_Frequency(pll) / 80000;
 	
 	
 	printf("0x%p\r\n", SysTick_Handler);

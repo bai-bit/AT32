@@ -1,10 +1,9 @@
 #ifndef __VIRTUAL_UART_H
 #define __VIRTUAL_UART_H
-#include<gpio_init.h>
-#include<nvic.h>
-#include<exti.h>
-#include<at32f4xx.h>
-#include<uart.h>
+#include "gpio_init.h"
+#include "exti.h"
+#include "at32f4xx.h"
+#include "uart.h"
 
 void uart1_io_config(void);
 void uart_virtual(uint32_t baud);

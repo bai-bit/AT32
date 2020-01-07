@@ -15,9 +15,9 @@ int main(int argc,const char *argv[])
 	//查找二十组，然后计算平均值。
 	//然后用1000000除以这个平均值，得到的就是近似于baud的值，
 	//这个值不是很准确，需要进一步选择
-	sysclk_PLLEN(PLLCLK_MUL_192MHz);
+	SysClk_PLLEN(PLLCLK_MUL_192MHz);
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-//uart1_init(115200);
+
 	DelayInit();
 	
 	auto_uart1_baud();

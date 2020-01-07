@@ -4,7 +4,7 @@
 extern u8 uart_read_buf[UART_SIZE];
 extern uint16_t uart_read_status;
 
-void exti_init(uint32_t exti_line, EXTI_MODE exti_mode, TRIGGER_MODE trigger_mode, FunctionalState NewStatus)
+void Exti_Init(uint32_t exti_line, EXTI_MODE exti_mode, TRIGGER_MODE trigger_mode, FunctionalState NewStatus)
 {
 	//使能某个中断线
 	//配置触发方式
@@ -25,12 +25,12 @@ void exti_init(uint32_t exti_line, EXTI_MODE exti_mode, TRIGGER_MODE trigger_mod
 		exti_mode ? (EXTI->INTEN &= ~(SET << exti_line)) : (EXTI->EVTEN &= ~(SET << exti_line));
 }
 
-FlagStatus get_extiinter(uint32_t exti_line)
+FlagStatus Get_ExtiInter(uint32_t exti_line)
 {
 	return (EXTI->PND | (0x02 << exti_line))? SET : RESET;
 }
 
-void clean_extiinter(uint32_t exti_line)
+void Clean_ExtiInter(uint32_t exti_line)
 {
 	EXTI->PND |= 0x02 << exti_line;
 }

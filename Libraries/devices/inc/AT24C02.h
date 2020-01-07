@@ -1,8 +1,8 @@
 #ifndef __AT24C02_H
 #define __AT24C02_H
 
-#include<gpio_iic.h>
-#include<stdio.h>
+#include "gpio_iic.h"
+#include <stdio.h>
 #define AT24C02 1
 
 #if AT24C01
@@ -11,7 +11,7 @@
 #define EEPROM_ENDADDR 255
 #endif
 
-void AT24CXX_Init(void);
+void AT24CXX_init(void);
 uint8_t AT24CXX_check(void);
 void AT24CXX_writebyte(uint32_t addr,uint8_t buf);
 uint8_t AT24CXX_readbyte(uint32_t addr);

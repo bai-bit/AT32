@@ -1,4 +1,4 @@
-#include<systick.h>
+#include<common.h>
 
 static __IO float fac_us;
 static __IO float fac_ms;
@@ -13,7 +13,7 @@ void DelayInit(void)
 	//³õÊ¼»¯fac_ms,fac_us.
 	SysTick->CTRL &= ~(SysTick_CTRL_CLKSOURCE_Msk);
 	
-	fac_us = (float)getclock_frequency(pll) / 8000000;
+	fac_us = (float)GetClock_Frequency(pll) / 8000000;
 	fac_ms = fac_us * 1000;
 }
 

@@ -1,4 +1,4 @@
-#include<uart.h>
+#include "uart.h"
 
 USART_Type* uart_list[]={USART1, USART2, USART3, UART4, UART5};
 char uart_rx_buf[UART_RX_BUF_SIZE]= "";
@@ -71,9 +71,9 @@ void UART_SetBaudRate(uint32_t instance, uint32_t baud)
     uint32_t tmpreg,integerdivider,fractionaldivider;
 
     if(instance == HW_USART1)
-        apbclock = getclock_frequency(pclk1);
+        apbclock = GetClock_Frequency(pclk1);
     else
-        apbclock = getclock_frequency(pclk2);
+        apbclock = GetClock_Frequency(pclk2);
   
     integerdivider = ((25 * apbclock) / (4 * baud));
   
@@ -129,32 +129,9 @@ void USART_Cmd(uint32_t instance, FunctionalState NewStatus)
 }
 
 
-void log_uart(uint8_t instance, char *buf)
-{
-    u8 send_buf[UART_RX_BUF_SIZE];
-    uint32_t i;
-    for(i = 0;i < UART_RX_BUF_SIZE;i++)
-    {
-        send_buf[i] = *buf++;
-        if(send_buf[i] == '\0')
-            i = UART_RX_BUF_SIZE;
-	}
-	for(i = 0;i < UART_RX_BUF_SIZE;i++)
-	{
-		call_back_send(instance,send_buf[i]);
-		if(send_buf[i] == '\0')
-			i = UART_RX_BUF_SIZE;
-	}
-}
 
-void call_back_send(uint8_t instance, char ch)
-{
-    while((uart_list[instance]->STS &0x80) == 0)
-        continue;
-    uart_list[instance]->DT =(uint8_t) ch;
-}
 
-ITStatus uart_getinter(uint32_t instance, uint32_t uart_interrupt)
+ITStatus UART_GetInter(uint32_t instance, uint32_t uart_interrupt)
 {
 	//首先确定寄存器
 	//然后确定配置的中断
@@ -183,7 +160,7 @@ ITStatus uart_getinter(uint32_t instance, uint32_t uart_interrupt)
 		return RESET;
 }
 	
-uint16_t uartrecvive_data(uint32_t instance)
+uint16_t UART_RecviveData(uint32_t instance)
 {
 	return uart_list[instance]->DT & UART_DATA_MASK;
 }
@@ -221,9 +198,9 @@ void USART1_IRQHandler(void)
 	//判断接受的数据，0x0a 0x0d	
 	u8 rev = 0;
 	
-	if(uart_getinter(HW_USART1, UART_INT_RDNE) == SET)
+	if(UART_GetInter(HW_USART1, UART_INT_RDNE) == SET)
 	{
-		rev = uartrecvive_data(HW_USART1);
+		rev = UART_RecviveData(HW_USART1);
 		rev1 = rev;
 		flag = 1;
 		
@@ -288,3 +265,27 @@ int fgetc(FILE *stream)
 	return rev1;	
 }
 
+void log_uart(uint8_t instance, char *buf)
+{
+    u8 send_buf[UART_RX_BUF_SIZE];
+    uint32_t i;
+    for(i = 0;i < UART_RX_BUF_SIZE;i++)
+    {
+        send_buf[i] = *buf++;
+        if(send_buf[i] == '\0')
+            i = UART_RX_BUF_SIZE;
+	}
+	for(i = 0;i < UART_RX_BUF_SIZE;i++)
+	{
+		call_back_send(instance,send_buf[i]);
+		if(send_buf[i] == '\0')
+			i = UART_RX_BUF_SIZE;
+	}
+}
+
+void call_back_send(uint8_t instance, char ch)
+{
+    while((uart_list[instance]->STS &0x80) == 0)
+        continue;
+    uart_list[instance]->DT =(uint8_t) ch;
+}

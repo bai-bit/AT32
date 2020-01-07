@@ -7,10 +7,11 @@
 /****达到延时1微秒以下的时间。                                                   ****/
 /****                                                                            ****/
 /************************************************************************************/
-#include<systick.h>
-#include<led.h>
-#include<uart.h>
-#include<virtual_uart.h>
+#include "common.h"
+#include "led.h"
+#include "uart.h"
+#include "virtual_uart.h"
+#include "systemclk.h"
 
 
 extern u8 uart_read_buf[UART_SIZE];
@@ -19,7 +20,7 @@ extern uint16_t uart_read_status;
 
 int main(int argc, const char *argv[])
 {
-	sysclk_PLLEN(PLLCLK_MUL_192MHz);
+	SysClk_PLLEN(PLLCLK_MUL_192MHz);
 	DelayInit();
 
 	led_red_init();

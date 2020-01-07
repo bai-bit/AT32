@@ -1,7 +1,8 @@
-#include<systick.h>
-#include<led.h>
-#include<uart.h>
-#include<systemclk.h>
+#include"common.h"
+#include"led.h"
+#include"uart.h"
+#include"systemclk.h"
+#include<stdio.h>
 
 int main(int argc,const char *argv[])
 {
@@ -10,27 +11,25 @@ int main(int argc,const char *argv[])
 	//优先级分组
 	//初始化串口
 	//while(1);
-	sysclk_PLLEN(PLLCLK_MUL_192MHz);
+	SysClk_PLLEN(PLLCLK_MUL_192MHz);
 	uint32_t clock;
-	char *string;
-	clock = getclock_frequency(pll);
+	//char *string;
+	clock = GetClock_Frequency(pll);
 	DelayInit();
 
 	led_red_init();
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
- 	uart1_init(115200);
-
+    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_AF_PP);
+    GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Mode_IN_FLOATING);
+ 	UART_Init(HW_USART1, BAUD_115200);
+    
 	while(1)
 	{
-		
-		if(uart_rx_status & 0x4000)
+		if(uart_rx_status & 0x8000)
 		{
-//		string = itoa(clock);
-//		log_uart(HW_USART1,string);
 			printf("clock = [%d]\r\n",clock);
 			uart_rx_status = 0;
 		}
-	//	log_uart(HW_USART1,"ABC");
 	}
 	
 }	

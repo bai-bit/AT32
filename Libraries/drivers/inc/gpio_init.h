@@ -1,7 +1,7 @@
 #ifndef __GPIO_INIT_H
 #define __GPIO_INIT_H
 
-#include <at32f4xx.h>
+#include "at32f4xx.h"
 
 #define HW_GPIOA  (0)
 #define HW_GPIOB  (1)

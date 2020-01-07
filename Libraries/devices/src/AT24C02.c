@@ -1,8 +1,8 @@
 #include<AT24C02.h>
 
-void AT24CXX_Init(void)
+void AT24CXX_init(void)
 {
-    iic_init();	
+    IIC_Init();	
 }
 
 uint8_t AT24CXX_check(void)
@@ -58,17 +58,17 @@ uint8_t AT24CXX_readbyte(uint32_t addr)
 {
     uint8_t temp = 0;
     //在指定的地址读取一个字节
-    iic_start();
-    iic_send_data(0xA0);
-    if(iic_wait_ack())
+    IIC_Start();
+    IIC_SendData(0xA0);
+    if(IIC_WaitAck())
     {
-        iic_send_data(addr);
-        iic_wait_ack();
-        iic_start();
-        iic_send_data(0xA1);
-        iic_wait_ack();
-        temp = iic_receive_data(0);
-        iic_stop();		
+        IIC_SendData(addr);
+        IIC_WaitAck();
+        IIC_Start();
+        IIC_SendData(0xA1);
+        IIC_WaitAck();
+        temp = IIC_ReceiveData(0);
+        IIC_Stop();		
     }
     return temp;
 }
@@ -77,17 +77,17 @@ void AT24CXX_writebyte(uint32_t addr,uint8_t buf)
 {
     //在指定的地址写入一个字节
     
-    iic_start();
+    IIC_Start();
     
-    iic_send_data(0xA0);
+    IIC_SendData(0xA0);
     
-    if(iic_wait_ack())
+    if(IIC_WaitAck())
     {
-        iic_send_data(addr);
-        iic_wait_ack();
-        iic_send_data(buf);
-        iic_wait_ack();
-        iic_stop();
+        IIC_SendData(addr);
+        IIC_WaitAck();
+        IIC_SendData(buf);
+        IIC_WaitAck();
+        IIC_Stop();
         delayms(5);
     }
 }

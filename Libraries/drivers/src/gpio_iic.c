@@ -1,7 +1,7 @@
 //simulation iic
 #include<gpio_iic.h>
 
-void iic_init(void)
+void IIC_Init(void)
 {
     //initialization iic
     //initialization gpio
@@ -14,7 +14,7 @@ void iic_init(void)
     GPIO_PinWrite(HW_GPIOB,GPIO_PIN_9,1);
 }
 
-void iic_start(void)
+void IIC_Start(void)
 {
     IIC_SDA_OUT;
     
@@ -26,7 +26,7 @@ void iic_start(void)
     IIC_SCL = 0;
 }
 
-void iic_stop(void)
+void IIC_Stop(void)
 {
     IIC_SDA_OUT;
     
@@ -39,7 +39,7 @@ void iic_stop(void)
     delayus(5);
 }
 
-uint8_t iic_wait_ack(void)
+uint8_t IIC_WaitAck(void)
 {
     uint32_t timeout = 0x01000;
     uint8_t ret = 0;
@@ -54,7 +54,7 @@ uint8_t iic_wait_ack(void)
         timeout--;
         if(timeout == 0)
         {
-            iic_stop();
+            IIC_Stop();
             return 0;
         }
         printf("B");
@@ -64,7 +64,7 @@ uint8_t iic_wait_ack(void)
     return ret;
 }
 
-void iic_ack(void)
+void IIC_Ack(void)
 {
     IIC_SCL = 0;
     IIC_SDA_OUT;
@@ -77,7 +77,7 @@ void iic_ack(void)
     IIC_SDA_IN;
 }
 
-void iic_notack(void)
+void IIC_NotAck(void)
 {
     IIC_SCL = 0;
     IIC_SDA_OUT;
@@ -90,7 +90,7 @@ void iic_notack(void)
     IIC_SCL = 0;
 }
 
-void iic_send_data(uint8_t data)
+void IIC_SendData(uint8_t data)
 {
     uint8_t i = 0;
     
@@ -112,7 +112,7 @@ void iic_send_data(uint8_t data)
     }
 }
 
-uint8_t iic_receive_data(uint8_t ack)
+uint8_t IIC_ReceiveData(uint8_t ack)
 {
     uint8_t ret = 0;
     uint8_t i = 0;
@@ -129,9 +129,9 @@ uint8_t iic_receive_data(uint8_t ack)
         delayus(2);
     }
     if(ack)
-        iic_ack();
+        IIC_Ack();
     else
-        iic_notack();
+        IIC_NotAck();
     
     return ret;
 }

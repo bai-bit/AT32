@@ -4,20 +4,20 @@ uint32_t SystemCoreClock;
 
 //开启HSE
 
-void sysclk_HSIEN(void)
+void SysClk_HSIEN(void)
 {
-	system_init();
+	System_Init();
 	RCC->CFG |= SYSCLKSEL_HSI;
 	RCC->CFG |= SYSCLK_1 | HCLK_1;
 	SystemCoreClock = 8000000;
 }
 
-void sysclk_HSEEN(void)
+void SysClk_HSEEN(void)
 {
 	//先使能外部高速时钟
 	//切换系统时钟源
 	//关闭内部高速时钟
-	system_init();
+	System_Init();
 	RCC->CTRL |= HSEEN_BIT;
 	
 	do{
@@ -32,14 +32,14 @@ void sysclk_HSEEN(void)
 
 }
 
-void sysclk_PLLEN(uint32_t PLLCLK_MUL)
+void SysClk_PLLEN(uint32_t PLLCLK_MUL)
 {
 	//使能HSE时钟
 	//稳定之后，确定各总线的分频系数
 	//选择PLL的倍频系数
 	//使能PLL时钟
 	
-	system_init();
+	System_Init();
 	RCC->CTRL |= HSEEN_BIT;
 	
 	do{
@@ -53,7 +53,6 @@ void sysclk_PLLEN(uint32_t PLLCLK_MUL)
 	RCC->CFG &= ~PLLCLK_Mask;
 	RCC->CFG |= PLLCLK_MUL;
 	RCC->CFG |= PLLSRC_HSE;
-//RCC->CFG &= ~PLLSRC_HSI;
 
 	RCC->CFG |= PLLRANGE_GR72MHz;
 	
@@ -114,7 +113,7 @@ void sysclk_PLLEN(uint32_t PLLCLK_MUL)
 	
 }
 
-void system_init(void)
+void System_Init(void)
 {
 	//先使能HSI
 	RCC->CTRL |= HSIEN_BIT;
