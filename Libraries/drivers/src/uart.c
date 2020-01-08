@@ -6,33 +6,33 @@ uint16_t uart_rx_status;
 
 uint32_t UART_Init(uint32_t instance, uint32_t baudrate)
 {
-	//开启串口时钟
-	//配置串口寄存器
-	//CR1:停止位
-	//CR2:字长，模式，奇偶校验
-	//CR3:硬件流控制
-	switch (instance)
-	{
-		case HW_USART1:
-			RCC->APB2EN |= RCC_APB2EN_USART1EN;
-			break;
-		case HW_USART2:
-			RCC->APB1EN |= RCC_APB1EN_USART2EN;
-			break;
-		case HW_USART3:
-			RCC->APB1EN |= RCC_APB1EN_USART3EN;
-			break;
-		case HW_UART4:
-			RCC->APB1EN |= RCC_APB1EN_UART4EN;
-			break;
-		case HW_UART5:
-			RCC->APB1EN |= RCC_APB1EN_UART5EN;
-			break;
-		default:
-			return 0;
-	}
+    //开启串口时钟
+    //配置串口寄存器
+    //CR1:停止位
+    //CR2:字长，模式，奇偶校验
+    //CR3:硬件流控制
+    switch (instance)
+    {
+        case HW_USART1:
+            RCC->APB2EN |= RCC_APB2EN_USART1EN;
+            break;
+        case HW_USART2:
+            RCC->APB1EN |= RCC_APB1EN_USART2EN;
+            break;
+        case HW_USART3:
+            RCC->APB1EN |= RCC_APB1EN_USART3EN;
+            break;
+        case HW_UART4:
+            RCC->APB1EN |= RCC_APB1EN_UART4EN;
+            break;
+        case HW_UART5:
+            RCC->APB1EN |= RCC_APB1EN_UART5EN;
+            break;
+        default:
+            return 0;
+    }
 	
-	uint32_t tmpreg = 0;
+    uint32_t tmpreg = 0;
 
     tmpreg = uart_list[instance]->CTRL1;
     tmpreg &= CTRL1_MASK;
