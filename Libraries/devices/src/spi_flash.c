@@ -29,9 +29,9 @@ static uint8_t spi_flash_read_register(void);
 static void spi_flash_write_disable(void);
 
 spi_flash_dev_t ops;
-void spi_flash_init(spi_flash_dev_t *opers)
+void spi_flash_init(spi_flash_dev_t *remap_ops)
 {
-    memcpy(&ops,opers,sizeof(ops)); 
+    memcpy(&ops,remap_ops,sizeof(ops)); 
 }
 
 uint16_t spi_flash_open(void)
@@ -44,7 +44,7 @@ uint16_t spi_flash_open(void)
     ops.xfer_data(READ_DEVICE_ID);
     ops.xfer_data(0x00);
     ops.xfer_data(0x00);
-    ops.xfer_data(0x00);
+    ops.xfer_data(0x00); 
     device_id |= ops.xfer_data(SEND_DEFAULT_VALUE) << 8;
     device_id |= ops.xfer_data(SEND_DEFAULT_VALUE);
     ops.cs(1);
@@ -53,7 +53,7 @@ uint16_t spi_flash_open(void)
     return device_id;
 }
 
-uint32_t spi_flash_read(uint32_t addr, uint8_t *buf, uint32_t bufnum)
+uint32_t spi_flash_read(uint32_t addr, uint8_t *buf, uint32_t len)
 {
     //由设备端调用，读取设备的储存数据
     uint32_t i = 0;
@@ -65,21 +65,21 @@ uint32_t spi_flash_read(uint32_t addr, uint8_t *buf, uint32_t bufnum)
     ops.xfer_data((uint8_t)((addr) >> 8));
     ops.xfer_data((uint8_t)(addr));
     
-    for(i = 0;i < bufnum;i++)
+    for(i = 0;i < len;i++)
         buf[i] = ops.xfer_data(SEND_DEFAULT_VALUE);
     
     ops.cs(1);
     return sizeof(buf);
 }
 
-uint32_t spi_flash_write(uint32_t addr, uint8_t *buf, uint32_t bufnum)
+uint32_t spi_flash_write(uint32_t addr, uint8_t *buf, uint32_t len)
 {
     //有设备端调用，向设备写入数据
     //读改写
     uint32_t i = 0;
     spi_flash_erase(addr / SECSIZE * SECSIZE);
-    if(bufnum > PAGESIZE)
-        bufnum = PAGESIZE;
+    if(len > PAGESIZE)
+        len = PAGESIZE;
 
     spi_flash_write_enable();
     spi_flash_wait_busy(FLASH_TIMEOUT_WEIRTE);
@@ -90,7 +90,7 @@ uint32_t spi_flash_write(uint32_t addr, uint8_t *buf, uint32_t bufnum)
     ops.xfer_data((uint8_t)((addr) >> 8));
     ops.xfer_data((uint8_t)(addr));
     
-    for(i = 0;i < bufnum;i++)
+    for(i = 0;i < len;i++)
         ops.xfer_data(buf[i]);
     
     ops.cs(1);
@@ -170,7 +170,7 @@ static void spi_flash_chip_erase(void)
 //wait busy
 static void spi_flash_wait_busy(uint32_t timeout)
 {
-    while(spi_flash_read_register() & 0x1) 
+    while(spi_flash_read_register() & 0x1 && timeout--) 
         continue;    
 }
 

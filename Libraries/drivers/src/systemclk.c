@@ -22,7 +22,7 @@ void SysClk_HSEEN(void)
 	
 	do{
 		
-	}while((RCC->CTRL & HSESTBL_FLAG) == 0 );
+	}while ((RCC->CTRL & HSESTBL_FLAG) == 0 );
 	
 	RCC->CFG |= SYSCLK_1 | HCLK_1;
 		
@@ -44,7 +44,7 @@ void SysClk_PLLEN(uint32_t PLLCLK_MUL)
 	
 	do{
 		
-	}while((RCC->CTRL & HSESTBL_FLAG) == 0);
+	}while ((RCC->CTRL & HSESTBL_FLAG) == 0);
 	
 	RCC->CFG |= SYSCLK_1;
 	RCC->CFG |= APB1CLK_DIV_2;
@@ -59,10 +59,10 @@ void SysClk_PLLEN(uint32_t PLLCLK_MUL)
 	RCC->CTRL |= PLLEN_BIT;
 	do{
 		
-	}while((RCC->CTRL & PLLSTBL_FLAG) == 0);
+	}while ((RCC->CTRL & PLLSTBL_FLAG) == 0);
 	
 	RCC->CFG |= SYSCLKSEL_PLL;
-	switch(PLLCLK_MUL)
+	switch (PLLCLK_MUL)
 	{
 		case PLLCLK_MUL_16MHz:
 			SystemCoreClock = 16000000;

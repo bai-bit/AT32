@@ -2,12 +2,12 @@
 
 GPIO_Type* gpio_list[]={GPIOA, GPIOB, GPIOC, GPIOD, GPIOE};
 
-void GPIO_Init(uint32_t GPIOx, uint16_t pin,GPIO_t mode)
+void GPIO_Init(uint32_t GPIOx, uint16_t pin, GPIO_t mode)
 {
     int pinmode = 0;
     int temp = 0, pinmask = 0;
     
-    switch(GPIOx)
+    switch (GPIOx)
     {
         case HW_GPIOA:
             RCC->APB2EN |= RCC_APB2EN_GPIOAEN;
@@ -26,10 +26,10 @@ void GPIO_Init(uint32_t GPIOx, uint16_t pin,GPIO_t mode)
     }
     
     pinmode = mode & 0xf;
-    if((mode & 0x10) == 0x10)
+    if ((mode & 0x10) == 0x10)
         pinmode |= GPIO_Speed_50MHz;
     
-    if(pin < 8) 
+    if (pin < 8) 
     {
         temp = gpio_list[GPIOx]->CTRLL;
         pin <<= 2;
@@ -38,14 +38,14 @@ void GPIO_Init(uint32_t GPIOx, uint16_t pin,GPIO_t mode)
         temp &= ~pinmask;
         temp |= pinmode << pin;
     
-        if(mode == GPIO_Mode_IPU)
+        if (mode == GPIO_Mode_IPU)
             gpio_list[GPIOx]->BSRE |= 1 << pin;
-        else if(mode == GPIO_Mode_IPD)
+        else if (mode == GPIO_Mode_IPD)
             gpio_list[GPIOx]->BRE |= 1 << pin;
       
         gpio_list[GPIOx]->CTRLL = temp;
     }
-    else if(pin >= 8 && pin < 16)                                         
+    else if (pin >= 8 && pin < 16)                                         
     {
         temp = gpio_list[GPIOx]->CTRLH;
         pin = (pin - 8)  << 2;
@@ -53,20 +53,20 @@ void GPIO_Init(uint32_t GPIOx, uint16_t pin,GPIO_t mode)
         pinmask = 0xf << pin;
         temp &= ~pinmask;
         temp |= pinmode << pin;
-        if(mode == GPIO_Mode_IPU)
+        if (mode == GPIO_Mode_IPU)
             gpio_list[GPIOx]->BSRE |= 1 << pin;
-        else if(mode == GPIO_Mode_IPU)
+        else if (mode == GPIO_Mode_IPU)
             gpio_list[GPIOx]->BRE |= 1 << pin;
     
         gpio_list[GPIOx]->CTRLH = temp;
     }
 }
 
-void GPIO_resetSpeed(uint32_t GPIOx,uint16_t pin,uint8_t speed)
+void GPIO_resetSpeed(uint32_t GPIOx, uint16_t pin, uint8_t speed)
 {
-    if(pin < 8)
+    if (pin < 8)
         gpio_list[GPIOx]->CTRLL |= speed << (pin << 2);
-    else if(pin >= 8 && pin < 16)
+    else if (pin >= 8 && pin < 16)
         gpio_list[GPIOx]->CTRLH |= speed << ((pin - 8) << 2);
 }
 void AFIO_Init(uint32_t GPIOx, uint16_t pin)
@@ -81,7 +81,7 @@ void AFIO_Init(uint32_t GPIOx, uint16_t pin)
 }
 void GPIO_PinWrite(uint32_t GPIOx, uint16_t pin, uint8_t num)
 {
-    if(num)
+    if (num)
         gpio_list[GPIOx]->BSRE = 1 << pin;
     else
         gpio_list[GPIOx]->BRE = 1 << pin;
@@ -89,7 +89,7 @@ void GPIO_PinWrite(uint32_t GPIOx, uint16_t pin, uint8_t num)
 
 void GPIO_PinToggle(uint32_t GPIOx, uint16_t pin)
 {
-    if(gpio_list[GPIOx]->OPTDT & (0x1 << pin))
+    if (gpio_list[GPIOx]->OPTDT & (0x1 << pin))
         GPIO_PinWrite(GPIOx, pin, 0);
     else
         GPIO_PinWrite(GPIOx, pin, 1);
@@ -102,9 +102,9 @@ uint16_t read_gpioport(uint32_t GPIOx, uint16_t pin)
     return (gpio_list[GPIOx]->IPTDT & (uint16_t)0x01 << pin) ? SET : RESET;
 }
 
-void CLKOUT_Init(uint16_t GPIOx,uint16_t pin)
+void CLKOUT_Init(uint16_t GPIOx, uint16_t pin)
 {
-    GPIO_Init(GPIOx,pin,GPIO_Mode_AF_PP);
+    GPIO_Init(GPIOx, pin, GPIO_Mode_AF_PP);
 }          
 
 

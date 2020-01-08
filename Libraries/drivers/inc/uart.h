@@ -50,6 +50,6 @@ uint32_t UART_SetIntMode(uint32_t instance, UART_Int_t mode, uint8_t val);
 
 int fgetc(FILE *stream);
 void log_uart(uint8_t uartnum,char *buf);
-void call_back_send(uint8_t uartnum,char ch);
+void call_back_send(uint8_t uartnum,uint8_t ch);
 
 #endif

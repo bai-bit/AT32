@@ -1,6 +1,6 @@
 #ifndef __HW_SYSTICK_H
 #define __HW_SYSTICK_H
-#include<at32f4xx.h>
+#include "at32f4xx.h"
 
 #define SYSTEM_1               0x0000
 #define SYSTEM_2               0x0080

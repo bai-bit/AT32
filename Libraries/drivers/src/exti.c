@@ -22,7 +22,7 @@ void Exti_Init(uint32_t exti_line, EXTI_MODE exti_mode, TRIGGER_MODE trigger_mod
 		}
 	}
 	else
-		exti_mode ? (EXTI->INTEN &= ~(SET << exti_line)) : (EXTI->EVTEN &= ~(SET << exti_line));
+		exti_mode ? (EXTI->EVTEN &= ~(SET << exti_line)) : (EXTI->INTEN &= ~(SET << exti_line));
 }
 
 FlagStatus Get_ExtiInter(uint32_t exti_line)

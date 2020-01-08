@@ -1,4 +1,4 @@
-#include<common.h>
+#include "common.h"
 
 static __IO float fac_us;
 static __IO float fac_ms;
@@ -88,14 +88,14 @@ uint32_t GetClock_Frequency(CLOCKFRE_t clock)
     pll_value1 = pll_frafremask & PLL_FRAMASK1;
     pll_value2 = pll_frafremask & PLL_FRAMASK2;
     
-    if((pll_value = (pll_value1 | pll_value2)) == RESET)
+    if ((pll_value = (pll_value1 | pll_value2)) == RESET)
         pll_frafreval = 2;
-    else if(pll_value < 50 && pll_value > 1)
+    else if (pll_value < 50 && pll_value > 1)
         pll_frafreval = pll_value + 1;
     else
         pll_frafreval = pll_value - 1;
 		
-    switch(AHB_FRAMASK & RCC->CFG)
+    switch (AHB_FRAMASK & RCC->CFG)
     {
         case SYSTEM_1:
             ahb_div = 1;
@@ -122,7 +122,7 @@ uint32_t GetClock_Frequency(CLOCKFRE_t clock)
             ahb_div = 512;
     }
     
-    switch((APB1_FRAMASK & RCC->CFG) >> 8)
+    switch ((APB1_FRAMASK & RCC->CFG) >> 8)
     {
         case HCLK_1:
             apb1_div = 1;
@@ -139,7 +139,7 @@ uint32_t GetClock_Frequency(CLOCKFRE_t clock)
         case HCLK_16:
             apb1_div = 16;
     }
-    switch((APB2_FRAMASK & RCC->CFG) >> 11)
+    switch ((APB2_FRAMASK & RCC->CFG) >> 11)
     {
         case HCLK_1:
             apb2_div = 1;
@@ -157,7 +157,7 @@ uint32_t GetClock_Frequency(CLOCKFRE_t clock)
             apb2_div = 16;
     }
     
-    switch(clock)
+    switch (clock)
     {
         case pll:
         case systemclock:

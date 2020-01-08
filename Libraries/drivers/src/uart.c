@@ -11,7 +11,7 @@ uint32_t UART_Init(uint32_t instance, uint32_t baudrate)
 	//CR1:停止位
 	//CR2:字长，模式，奇偶校验
 	//CR3:硬件流控制
-	switch(instance)
+	switch (instance)
 	{
 		case HW_USART1:
 			RCC->APB2EN |= RCC_APB2EN_USART1EN;
@@ -36,7 +36,7 @@ uint32_t UART_Init(uint32_t instance, uint32_t baudrate)
 
     tmpreg = uart_list[instance]->CTRL1;
     tmpreg &= CTRL1_MASK;
-    tmpreg |=   USART_CTRL1_REN | USART_CTRL1_TEN;
+    tmpreg |= USART_CTRL1_REN | USART_CTRL1_TEN;
     uart_list[instance]->CTRL1 = (uint16_t)tmpreg;
     
     tmpreg = uart_list[instance]->CTRL2;
@@ -67,10 +67,10 @@ uint32_t UART_DeInit(uint32_t instance)
 }
 void UART_SetBaudRate(uint32_t instance, uint32_t baud)
 {
-    uint32_t apbclock;
-    uint32_t tmpreg,integerdivider,fractionaldivider;
+    uint32_t apbclock = 0;
+    uint32_t tmpreg = 0, integerdivider = 0, fractionaldivider = 0;
 
-    if(instance == HW_USART1)
+    if (instance == HW_USART1)
         apbclock = GetClock_Frequency(pclk1);
     else
         apbclock = GetClock_Frequency(pclk2);
@@ -104,14 +104,14 @@ void USART_ITConfig(uint32_t instance, uint16_t uart_interrupt, FunctionalState 
 	
 	configbit = 1 << setmov;
 	
-	if(0x01 == tempreg)
+	if (0x01 == tempreg)
 		uartxbase += 0x0c;
-	else if(tempreg == 0x02)
+	else if (tempreg == 0x02)
 		uartxbase += 0x10;
 	else
 		uartxbase += 0x14;
 	
-	if(NewStatus == ENABLE)
+	if (NewStatus == ENABLE)
 		*(uint32_t *)uartxbase |= configbit;
 	else
 		*(uint32_t *)uartxbase &= ~configbit;
@@ -122,7 +122,7 @@ void USART_Cmd(uint32_t instance, FunctionalState NewStatus)
 {
 	//使能串口,配置CR1寄存器的第十三位
 	
-    if(NewStatus == ENABLE)
+    if (NewStatus == ENABLE)
         uart_list[instance]->CTRL1 |= USART_CTRL1_UEN;
     else
         uart_list[instance]->CTRL1 &= ~USART_CTRL1_UEN;
@@ -143,9 +143,9 @@ ITStatus UART_GetInter(uint32_t instance, uint32_t uart_interrupt)
 	interbit = uart_interrupt & REGMASK;
 	interbit = 0x01 << interbit;
 	
-	if(0x01 == uartreg)
+	if (0x01 == uartreg)
 		uartinter = uart_list[instance]->CTRL1 & interbit;
-	else if(0x02 == uartreg)
+	else if (0x02 == uartreg)
 		uartinter = uart_list[instance]->CTRL2 & interbit;
 	else
 		uartinter = uart_list[instance]->CTRL3 & interbit;
@@ -154,7 +154,7 @@ ITStatus UART_GetInter(uint32_t instance, uint32_t uart_interrupt)
 	flagmask = 0x01 << uartflag;
 	flagmask &= uart_list[instance]->STS;
 	
-	if(uartinter != 0 && flagmask != 0)
+	if (uartinter && flagmask)
 		return SET;
 	else
 		return RESET;
@@ -167,25 +167,25 @@ uint16_t UART_RecviveData(uint32_t instance)
 
 uint32_t UART_GetChar(uint32_t instance, uint8_t *ch)
 {
-    if(uart_list[instance]->STS & (1<<5))
+    if (uart_list[instance]->STS & (1 << 5))
     {
-        *ch = (uart_list[instance]->DT& 0xFF);
+        *ch = (uart_list[instance]->DT & 0xFF);
         return 0;
     }
     return 1;
 }
 void UART_PutChar(uint32_t instance, uint8_t ch)
 {
-    while (!((uart_list[instance]->STS) & (1<<7))); 
+    while (!((uart_list[instance]->STS) & (1 << 7))); 
     uart_list[instance]->DT  = ch;             
 }
 
 uint32_t UART_SetIntMode(uint32_t instance, UART_Int_t mode, uint8_t val)
 {
     if(mode == kUART_IntTx)
-        USART_ITConfig(instance,UART_INT_TXE,val);
+        USART_ITConfig(instance, UART_INT_TXE, val);
     else if(mode == kUART_IntRx)
-        USART_ITConfig(instance,UART_INT_RDNE,val);
+        USART_ITConfig(instance, UART_INT_RDNE, val);
     return 0;
 }
 
@@ -267,25 +267,25 @@ int fgetc(FILE *stream)
 
 void log_uart(uint8_t instance, char *buf)
 {
-    u8 send_buf[UART_RX_BUF_SIZE];
-    uint32_t i;
-    for(i = 0;i < UART_RX_BUF_SIZE;i++)
+    u8 send_buf[UART_RX_BUF_SIZE] = "";
+    uint32_t i = 0;
+    for (i = 0; i < UART_RX_BUF_SIZE; i++)
     {
         send_buf[i] = *buf++;
-        if(send_buf[i] == '\0')
+        if (send_buf[i] == '\0')
             i = UART_RX_BUF_SIZE;
 	}
-	for(i = 0;i < UART_RX_BUF_SIZE;i++)
+	for (i = 0; i < UART_RX_BUF_SIZE; i++)
 	{
 		call_back_send(instance,send_buf[i]);
-		if(send_buf[i] == '\0')
+		if (send_buf[i] == '\0')
 			i = UART_RX_BUF_SIZE;
 	}
 }
 
-void call_back_send(uint8_t instance, char ch)
+void call_back_send(uint8_t instance, uint8_t ch)
 {
-    while((uart_list[instance]->STS &0x80) == 0)
+    while ((uart_list[instance]->STS &0x80) == 0)
         continue;
-    uart_list[instance]->DT =(uint8_t) ch;
+    uart_list[instance]->DT = ch;
 }
