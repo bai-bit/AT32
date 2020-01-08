@@ -33,9 +33,9 @@ void flash_lock(void);
 
 uint16_t Flash_ReadHalfWord(uint32_t addr);		    
 
-void Flash_Write(uint32_t addr,uint16_t *buf,uint16_t len);		//从指定地址开始写入指定长度的数据
-void flash_read(uint32_t addr,uint16_t *buf,uint16_t len);   		//从指定地址开始读出指定长度的数据
-void Flash_WritePageWord(uint32_t addr,uint16_t *buf,uint16_t len);
+void Flash_Write(uint32_t addr, uint16_t *buf, uint16_t len);		//从指定地址开始写入指定长度的数据
+void flash_read(uint32_t addr, uint16_t *buf, uint16_t len);   		//从指定地址开始读出指定长度的数据
+void Flash_WritePageWord(uint32_t addr, uint16_t *buf, uint16_t len);
 
 FLASH_Status Flash_WriteHalfWord(uint32_t addr, uint16_t data);
 FLASH_Status Flash_WaitProcess(uint32_t timeout);
