@@ -53,9 +53,9 @@ uint32_t UART_Init(uint32_t instance, uint32_t baudrate)
     UART_SetBaudRate(instance,baudrate);
     
     USART_ITConfig(HW_USART1, UART_INT_RDNE, ENABLE);
-	USART_Cmd(HW_USART1, ENABLE);
-	
-	NVIC_Init(USART1_IRQn, 2, 2, ENABLE);
+    USART_Cmd(HW_USART1, ENABLE);
+    
+    NVIC_Init(USART1_IRQn, 2, 2, ENABLE);
     
     return 1;
 }
@@ -74,13 +74,13 @@ void UART_SetBaudRate(uint32_t instance, uint32_t baud)
         apbclock = GetClock_Frequency(pclk1);
     else
         apbclock = GetClock_Frequency(pclk2);
-  
+    
     integerdivider = ((25 * apbclock) / (4 * baud));
-  
+    
     tmpreg = (integerdivider / 100) << 4;
-
+    
     fractionaldivider = integerdivider - (100 * (tmpreg >> 4));
-
+    
     tmpreg |= ((((fractionaldivider * 16) + 50) / 100)) & ((uint8_t)0x0F);
     
     uart_list[instance]->BAUDR = (uint16_t)tmpreg;
@@ -88,40 +88,40 @@ void UART_SetBaudRate(uint32_t instance, uint32_t baud)
 
 void USART_ITConfig(uint32_t instance, uint16_t uart_interrupt, FunctionalState NewStatus)
 {
-	//开启相应的中断
-	//首先获取串口的基地址
-	//然后把中断值屏蔽高八位，将低八位右移五位，确定配置的寄存器,
-	//接下来获取第五位的值，确定配置的位
-	//然后通过基地址加偏移地址，确定到寄存器的地址，根据NewState，配置某一个位
+    //开启相应的中断
+    //首先获取串口的基地址
+    //然后把中断值屏蔽高八位，将低八位右移五位，确定配置的寄存器,
+    //接下来获取第五位的值，确定配置的位
+    //然后通过基地址加偏移地址，确定到寄存器的地址，根据NewState，配置某一个位
     uint32_t uartxbase = 0;
     uint16_t tempreg = 0, setmov = 0, configbit = 0;
+    
+    uartxbase = (uint32_t)uart_list[instance];
+    
+    tempreg = (uart_interrupt & 0xff) >> 5;
+    
+    setmov = uart_interrupt & REGMASK;
+    
+    configbit = 1 << setmov;
+    
+    if (0x01 == tempreg)
+        uartxbase += 0x0c;
+    else if (tempreg == 0x02)
+        uartxbase += 0x10;
+    else
+        uartxbase += 0x14;
 	
-	uartxbase = (uint32_t)uart_list[instance];
-	
-	tempreg = (uart_interrupt & 0xff) >> 5;
-	
-	setmov = uart_interrupt & REGMASK;
-	
-	configbit = 1 << setmov;
-	
-	if (0x01 == tempreg)
-		uartxbase += 0x0c;
-	else if (tempreg == 0x02)
-		uartxbase += 0x10;
-	else
-		uartxbase += 0x14;
-	
-	if (NewStatus == ENABLE)
-		*(uint32_t *)uartxbase |= configbit;
-	else
-		*(uint32_t *)uartxbase &= ~configbit;
+    if (NewStatus == ENABLE)
+        *(uint32_t *)uartxbase |= configbit;
+    else
+        *(uint32_t *)uartxbase &= ~configbit;
 }
 
 
 void USART_Cmd(uint32_t instance, FunctionalState NewStatus)
 {
-	//使能串口,配置CR1寄存器的第十三位
-	
+    //使能串口,配置CR1寄存器的第十三位
+    
     if (NewStatus == ENABLE)
         uart_list[instance]->CTRL1 |= USART_CTRL1_UEN;
     else
@@ -133,36 +133,36 @@ void USART_Cmd(uint32_t instance, FunctionalState NewStatus)
 
 ITStatus UART_GetInter(uint32_t instance, uint32_t uart_interrupt)
 {
-	//首先确定寄存器
-	//然后确定配置的中断
-	//接下来确定相应中断的标志位
-	//通过if。。。else语句返回状态
-	uint16_t uartreg = 0, interbit = 0, uartinter = 0, uartflag = 0, flagmask = 0;
+    //首先确定寄存器
+    //然后确定配置的中断
+    //接下来确定相应中断的标志位
+    //通过if。。。else语句返回状态
+    uint16_t uartreg = 0, interbit = 0, uartinter = 0, uartflag = 0, flagmask = 0;
+    
+    uartreg = (uint8_t)uart_interrupt >> 0x05;
+    interbit = uart_interrupt & REGMASK;
+    interbit = 0x01 << interbit;
+    
+    if (0x01 == uartreg)
+        uartinter = uart_list[instance]->CTRL1 & interbit;
+    else if (0x02 == uartreg)
+        uartinter = uart_list[instance]->CTRL2 & interbit;
+    else
+        uartinter = uart_list[instance]->CTRL3 & interbit;
 	
-	uartreg = (uint8_t)uart_interrupt >> 0x05;
-	interbit = uart_interrupt & REGMASK;
-	interbit = 0x01 << interbit;
-	
-	if (0x01 == uartreg)
-		uartinter = uart_list[instance]->CTRL1 & interbit;
-	else if (0x02 == uartreg)
-		uartinter = uart_list[instance]->CTRL2 & interbit;
-	else
-		uartinter = uart_list[instance]->CTRL3 & interbit;
-	
-	uartflag = uart_interrupt >> 0x08;
-	flagmask = 0x01 << uartflag;
-	flagmask &= uart_list[instance]->STS;
-	
-	if (uartinter && flagmask)
-		return SET;
-	else
-		return RESET;
+    uartflag = uart_interrupt >> 0x08;
+    flagmask = 0x01 << uartflag;
+    flagmask &= uart_list[instance]->STS;
+    
+    if (uartinter && flagmask)
+        return SET;
+    else
+        return RESET;
 }
 	
 uint16_t UART_RecviveData(uint32_t instance)
 {
-	return uart_list[instance]->DT & UART_DATA_MASK;
+    return uart_list[instance]->DT & UART_DATA_MASK;
 }
 
 uint32_t UART_GetChar(uint32_t instance, uint8_t *ch)
@@ -189,44 +189,44 @@ uint32_t UART_SetIntMode(uint32_t instance, UART_Int_t mode, uint8_t val)
     return 0;
 }
 
-static u8 rev1;
-static u8 flag = 0;
+static uint8_t rev1;
+static uint8_t flag = 0;
 void USART1_IRQHandler(void)
 {
-	//接受数据
-	//判断接受标志位
-	//判断接受的数据，0x0a 0x0d	
-	u8 rev = 0;
-	
-	if(UART_GetInter(HW_USART1, UART_INT_RDNE) == SET)
-	{
-		rev = UART_RecviveData(HW_USART1);
-		rev1 = rev;
-		flag = 1;
-		
-		if((uart_rx_status & UART_STATUS_NLINE) == RESET)
-		{
-			if(uart_rx_status & UART_STATUS_ENTER)
-			{
-				if(rev == 0x0a)
-					uart_rx_status |= UART_STATUS_NLINE;
-				else
-					uart_rx_status = RESET;
-			}
-			else
-			{
-				if(rev == 0x0d)
-					uart_rx_status |= UART_STATUS_ENTER;
-				else
-				{
-					uart_rx_buf[uart_rx_status & UART_STATUS_MASK] = rev;
-					uart_rx_status ++;
-					if(uart_rx_status > UART_RX_BUF_SIZE)
-						uart_rx_status = RESET;
-				}
-			}
-		}
-	}
+    //接受数据
+    //判断接受标志位
+    //判断接受的数据，0x0a 0x0d	
+    uint8_t rev = 0;
+    
+    if (UART_GetInter(HW_USART1, UART_INT_RDNE) == SET)
+    {
+        rev = UART_RecviveData(HW_USART1);
+        rev1 = rev;
+        flag = 1;
+    
+        if ((uart_rx_status & UART_STATUS_NLINE) == RESET)
+        {
+            if (uart_rx_status & UART_STATUS_ENTER)
+            {
+                if (rev == 0x0a)
+                    uart_rx_status |= UART_STATUS_NLINE;
+                else
+                    uart_rx_status = RESET;
+            }
+            else
+            {
+                if (rev == 0x0d)
+                    uart_rx_status |= UART_STATUS_ENTER;
+                else
+                {
+                    uart_rx_buf[uart_rx_status & UART_STATUS_MASK] = rev;
+                    uart_rx_status ++;
+                    if(uart_rx_status > UART_RX_BUF_SIZE)
+                        uart_rx_status = RESET;
+                }
+            }
+        }
+    }
 }
 
 
@@ -234,8 +234,7 @@ void USART1_IRQHandler(void)
                  
 struct __FILE 
 { 
-	int handle; 
-
+    int handle; 
 }; 
 
 FILE __stdout;
@@ -244,43 +243,42 @@ FILE __stderr;
    
 void _sys_exit(int x) 
 { 
-	x = x; 
+    x = x; 
 } 
 
 int fputc(int ch, FILE *f)
 {      
-	while((USART1->STS & 0X40) == 0)
-		continue;  
-    USART1->DT = (u8) ch;      
-	return ch;
+    while((USART1->STS & 0X40) == 0)
+        continue;  
+    USART1->DT = (uint8_t) ch;      
+    return ch;
 }
-
 
 int fgetc(FILE *stream)
 {
-	while(flag == 0)
-		continue;
-	flag = 0;
-	
-	return rev1;	
+    while(flag == 0)
+        continue;
+    flag = 0;
+    
+    return rev1;	
 }
 
 void log_uart(uint8_t instance, char *buf)
 {
-    u8 send_buf[UART_RX_BUF_SIZE] = "";
+    uint8_t send_buf[UART_RX_BUF_SIZE] = "";
     uint32_t i = 0;
     for (i = 0; i < UART_RX_BUF_SIZE; i++)
     {
         send_buf[i] = *buf++;
         if (send_buf[i] == '\0')
             i = UART_RX_BUF_SIZE;
-	}
-	for (i = 0; i < UART_RX_BUF_SIZE; i++)
-	{
-		call_back_send(instance,send_buf[i]);
-		if (send_buf[i] == '\0')
-			i = UART_RX_BUF_SIZE;
-	}
+    }
+    for (i = 0; i < UART_RX_BUF_SIZE; i++)
+    {
+        call_back_send(instance,send_buf[i]);
+        if (send_buf[i] == '\0')
+            i = UART_RX_BUF_SIZE;
+    }
 }
 
 void call_back_send(uint8_t instance, uint8_t ch)
