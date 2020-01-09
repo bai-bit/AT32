@@ -1,9 +1,9 @@
 #include<AT24C02.h>
 
-void AT24CXX_init(void)
-{
-    IIC_Init();	
-}
+//void AT24CXX_init(void)
+//{
+//    IIC_Init();	
+//}
 
 uint8_t AT24CXX_check(void)
 {
