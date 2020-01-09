@@ -411,11 +411,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\Libraries\drivers\src\common.c</FilePath>
             </File>
-            <File>
-              <FileName>gpio_iic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\Libraries\drivers\src\gpio_iic.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -425,6 +420,11 @@
               <FileName>AT24C02.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\Libraries\devices\src\AT24C02.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio_iic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\Libraries\devices\src\gpio_iic.c</FilePath>
             </File>
           </Files>
         </Group>

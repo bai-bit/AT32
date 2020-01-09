@@ -3,7 +3,6 @@
 
 static simulation_iic_ops_t ops;
 void IIC_Init(simulation_iic_ops_t *opera)
-//void IIC_Init(void)
 {
     //initialization iic
     //initialization gpio
