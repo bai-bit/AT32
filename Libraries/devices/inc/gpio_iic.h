@@ -1,11 +1,11 @@
 #ifndef IIC_H
 #define IIC_H
-#include "gpio_init.h"
-#include "common.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
 typedef struct simulation_iic {
+    void (*IIC_DELAY)(uint8_t time);
     void (*IIC_GPIO_INIT)(void);
     void (*IIC_SDA_OUT)(void);
     void (*IIC_SDA_IN)(void);

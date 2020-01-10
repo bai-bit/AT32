@@ -76,7 +76,7 @@ uint8_t AT24CXX_readbyte(uint32_t addr)
 void AT24CXX_writebyte(uint32_t addr,uint8_t buf)
 {
     //在指定的地址写入一个字节
-    
+    uint32_t delay = 100000;
     IIC_Start();
     
     IIC_SendData(0xA0);
@@ -88,6 +88,6 @@ void AT24CXX_writebyte(uint32_t addr,uint8_t buf)
         IIC_SendData(buf);
         IIC_WaitAck();
         IIC_Stop();
-        delayms(5);
+        while(delay--);
     }
 }

@@ -12,7 +12,9 @@ void simulation_sda_in(void);
 void simulation_sda(uint8_t status);
 uint16_t simulation_sda_read(void);
 void simulation_scl(uint8_t status);
+void delay_time(uint8_t time);
 simulation_iic_ops_t ops = {
+    .IIC_DELAY = delay_time,
     .IIC_GPIO_INIT = simulation_iic_init,
     .IIC_SDA_OUT = simulation_sda_out,
     .IIC_SDA_IN = simulation_sda_in,
@@ -70,5 +72,9 @@ uint16_t simulation_sda_read(void)
 void simulation_scl(uint8_t status)
 {
     PBout(8) = status;
+}
+void delay_time(uint8_t time)
+{
+    delayus(time);
 }
 
