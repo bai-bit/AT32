@@ -9,7 +9,7 @@
 #define FLASH_KEY2              0xCDEF89AB
 #define SECTOR_SIZE             2048
 #define BANK1                   255
-#define FLASH_SIZE              1024	
+#define FLASH_SIZE              0xFA000	
 #define FLASH_FLAG_BSY          1  
 #define FLASH_FLAG_PRCDN        0x0020
 #define FLASH_FLAG_PRGMFLR      0x0004

@@ -55,7 +55,7 @@ void GPIO_Init(uint32_t GPIOx, uint16_t pin, GPIO_t mode)
         temp |= pinmode << pin;
         if (mode == GPIO_Mode_IPU)
             gpio_list[GPIOx]->BSRE |= 1 << pin;
-        else if (mode == GPIO_Mode_IPU)
+        else if (mode == GPIO_Mode_IPD)
             gpio_list[GPIOx]->BRE |= 1 << pin;
     
         gpio_list[GPIOx]->CTRLH = temp;

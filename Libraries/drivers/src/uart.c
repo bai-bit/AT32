@@ -1,7 +1,7 @@
 #include "uart.h"
 
 USART_Type* uart_list[]={USART1, USART2, USART3, UART4, UART5};
-char uart_rx_buf[UART_RX_BUF_SIZE]= "";
+uint8_t uart_rx_buf[UART_RX_BUF_SIZE]= "";
 uint16_t uart_rx_status;
 
 uint32_t UART_Init(uint32_t instance, uint32_t baudrate)
@@ -51,12 +51,9 @@ uint32_t UART_Init(uint32_t instance, uint32_t baudrate)
     uart_list[instance]->CTRL3 = (uint16_t)tmpreg;
 
     UART_SetBaudRate(instance,baudrate);
-    
-    USART_ITConfig(HW_USART1, UART_INT_RDNE, ENABLE);
-    USART_Cmd(HW_USART1, ENABLE);
-    
-    NVIC_Init(USART1_IRQn, 2, 2, ENABLE);
-    
+
+    USART_Cmd(instance, ENABLE);
+
     return 1;
 }
 
@@ -167,27 +164,30 @@ uint16_t UART_RecviveData(uint32_t instance)
 
 uint32_t UART_GetChar(uint32_t instance, uint8_t *ch)
 {
-    if (uart_list[instance]->STS & (1 << 5))
-    {
-        *ch = (uart_list[instance]->DT & 0xFF);
-        return 0;
-    }
-    return 1;
-}
-void UART_PutChar(uint32_t instance, uint8_t ch)
-{
-    while (!((uart_list[instance]->STS) & (1 << 7))); 
-    uart_list[instance]->DT  = ch;             
-}
 
-uint32_t UART_SetIntMode(uint32_t instance, UART_Int_t mode, uint8_t val)
-{
-    if(mode == kUART_IntTx)
-        USART_ITConfig(instance, UART_INT_TXE, val);
-    else if(mode == kUART_IntRx)
-        USART_ITConfig(instance, UART_INT_RDNE, val);
+    if (uart_list[instance]->STS & USART_STS_RDNE)
+    {
+
+        *ch = (uart_list[instance]->DT & 0xFF);
+        return 1;
+    }
     return 0;
 }
+
+void UART_PutChar(uint32_t instance, uint8_t ch)
+{
+    uart_list[instance]->DT  = ch;
+    while (!((uart_list[instance]->STS) & USART_STS_TRAC)); 
+}
+
+//uint32_t UART_SetIntMode(uint32_t instance, UART_Int_t mode, uint8_t val)
+//{
+////    if(mode == kUART_IntTx)
+////        USART_ITConfig(instance, UART_INT_TXE, val);
+////    else if(mode == kUART_IntRx)
+////        USART_ITConfig(instance, UART_INT_RDNE, val);
+////    return 0;
+//}
 
 static uint8_t rev1;
 static uint8_t flag = 0;
@@ -203,7 +203,7 @@ void USART1_IRQHandler(void)
         rev = UART_RecviveData(HW_USART1);
         rev1 = rev;
         flag = 1;
-    
+       
         if ((uart_rx_status & UART_STATUS_NLINE) == RESET)
         {
             if (uart_rx_status & UART_STATUS_ENTER)
@@ -220,7 +220,7 @@ void USART1_IRQHandler(void)
                 else
                 {
                     uart_rx_buf[uart_rx_status & UART_STATUS_MASK] = rev;
-                    uart_rx_status ++;
+                    uart_rx_status++;
                     if(uart_rx_status > UART_RX_BUF_SIZE)
                         uart_rx_status = RESET;
                 }
@@ -263,27 +263,12 @@ int fgetc(FILE *stream)
     return rev1;	
 }
 
-void log_uart(uint8_t instance, char *buf)
+void UART_SendData(uint8_t instance,uint8_t *buf,uint32_t length)
 {
-    uint8_t send_buf[UART_RX_BUF_SIZE] = "";
-    uint32_t i = 0;
-    for (i = 0; i < UART_RX_BUF_SIZE; i++)
-    {
-        send_buf[i] = *buf++;
-        if (send_buf[i] == '\0')
-            i = UART_RX_BUF_SIZE;
-    }
-    for (i = 0; i < UART_RX_BUF_SIZE; i++)
-    {
-        call_back_send(instance,send_buf[i]);
-        if (send_buf[i] == '\0')
-            i = UART_RX_BUF_SIZE;
-    }
-}
+     uint32_t i = 0;
 
-void call_back_send(uint8_t instance, uint8_t ch)
-{
-    while ((uart_list[instance]->STS &0x80) == 0)
-        continue;
-    uart_list[instance]->DT = ch;
+    for (i = 0; i < length; i++)
+    {
+        UART_PutChar(instance,buf[i]);
+    }
 }

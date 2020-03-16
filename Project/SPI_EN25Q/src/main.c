@@ -30,6 +30,9 @@ int main(int argc,const char *argv[])
     GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_AF_PP);
     GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Mode_IN_FLOATING);
     UART_Init(HW_USART1, BAUD_115200);
+    printf("this is applcation program\r\n");
+    
+    printf("__initial_sp = [%X]\r\n",__get_MSP());
     
     flash_board_module_init();
     

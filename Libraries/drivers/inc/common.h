@@ -37,6 +37,15 @@
 #define SYSTICK_SOURCE         SystemCoreClock
 #define SYSTICK_EXCEPTION      0x02
 
+#define LIB_DEBUG 
+#if defined(LIB_DEBUG)
+#include <stdio.h>
+#define LIB_TRACE printf
+#else
+#define LIB_TRACE(...)
+#endif
+
+
 typedef enum {systemclock,hclk,pclk1,pclk2,hse,hsi,lse,lsi,pll} CLOCKFRE_t;
 
 typedef enum {false = 0,true = !false} bool;

@@ -26,8 +26,8 @@
 #define UART_STATUS_MASK        0x3fff
 #define UART_STATUS_ENTER       0x4000
 #define UART_STATUS_NLINE       0x8000 
-#define UART_RX_BUF_SIZE        512
-extern char uart_rx_buf[UART_RX_BUF_SIZE];
+#define UART_RX_BUF_SIZE        50
+extern uint8_t uart_rx_buf[UART_RX_BUF_SIZE];
 extern uint16_t uart_rx_status;
 
 typedef enum
@@ -39,7 +39,8 @@ typedef enum
 uint32_t UART_Init(uint32_t instance, uint32_t baudrate);
 ITStatus UART_GetInter(uint32_t instance, uint32_t uart_interrupt);
 uint16_t UART_RecviveData(uint32_t instance);
-void USART_ITConfig(uint32_t uartnum, uint16_t uart_interrupt, FunctionalState NewStatus);
+void UART_SendData(uint8_t uartnum, uint8_t *buf, uint32_t length);
+    void USART_ITConfig(uint32_t uartnum, uint16_t uart_interrupt, FunctionalState NewStatus);
 void USART_Cmd(uint32_t uartnum, FunctionalState NewStatus);
 
 uint32_t UART_DeInit(uint32_t MAP);
@@ -49,7 +50,6 @@ void UART_PutChar(uint32_t instance, uint8_t ch);
 uint32_t UART_SetIntMode(uint32_t instance, UART_Int_t mode, uint8_t val);
 
 int fgetc(FILE *stream);
-void log_uart(uint8_t uartnum, char *buf);
 void call_back_send(uint8_t uartnum, uint8_t ch);
 
 #endif

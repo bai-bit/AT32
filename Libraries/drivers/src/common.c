@@ -3,6 +3,26 @@
 static __IO float fac_us;
 static __IO float fac_ms;
 
+/* debug ºê¶¨Òå */
+#ifdef LIB_DEBUG
+#if (defined(__CC_ARM)) || (defined(__ICCARM__))
+void __aeabi_assert(const char *failedExpr, const char *file, int line)
+{
+    printf("ASSERT ERROR \" %s \": file \"%s\" Line \"%d\" \n", failedExpr, file, line);
+    for (;;)
+    {
+    }
+}
+#elif(defined(__GNUC__))
+void __assert_func(const char *file, int line, const char *func, const char *failedExpr)
+{
+    printf("ASSERT ERROR \" %s \": file \"%s\" Line \"%d\" function name \"%s\" \n", failedExpr, file, line, func);
+    for (;;)
+    {
+    }
+}
+#endif /* (defined(__CC_ARM)) ||  (defined (__ICCARM__)) */
+#endif /* LIB_DEBUG */
 
 void DelayInit(void)
 {
@@ -14,6 +34,7 @@ void DelayInit(void)
     SysTick->CTRL &= ~(SysTick_CTRL_CLKSOURCE_Msk);
     
     fac_us = (float)GetClock_Frequency(pll) / 8000000;
+    fac_us = 1;
     fac_ms = fac_us * 1000;
 }
 
