@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F403Zx_XL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\Libraries\drivers\inc;..\..\..\Libraries\startup\CoreSupport;..\..\..\Libraries\startup\DeviceSupport</IncludePath>
+              <IncludePath>..\..\..\Libraries\drivers\inc;..\..\..\Libraries\startup\CoreSupport;..\..\..\Libraries\startup\DeviceSupport;..\..\..\Libraries\utilities\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -425,6 +425,16 @@
               <FileName>flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\Libraries\drivers\src\flash.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>utilities</GroupName>
+          <Files>
+            <File>
+              <FileName>bl_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\Libraries\utilities\src\bl_test.c</FilePath>
             </File>
           </Files>
         </Group>

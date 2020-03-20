@@ -34,7 +34,7 @@ void DelayInit(void)
     SysTick->CTRL &= ~(SysTick_CTRL_CLKSOURCE_Msk);
     
     fac_us = (float)GetClock_Frequency(pll) / 8000000;
-    fac_us = 1;
+ 
     fac_ms = fac_us * 1000;
 }
 
@@ -87,6 +87,13 @@ void delayus(uint32_t num)
 void systick_setexception(bool val)
 {
     val == true ? (SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk) : (SysTick->CTRL &= ~(SysTick_CTRL_TICKINT_Msk)); 
+}
+
+void systick_timeout(uint32_t value)
+{
+    (value * fac_us > 0xFFFFFF) ? (SysTick->LOAD = 0xFFFFFF) : (SysTick->LOAD = value * fac_us);
+    SysTick->VAL = 0;
+    SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_CLKSOURCE_Msk;
 }
 
 uint32_t GetClock_Frequency(CLOCKFRE_t clock)

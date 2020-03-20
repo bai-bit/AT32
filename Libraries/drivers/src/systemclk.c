@@ -28,7 +28,7 @@ void SysClk_HSEEN(void)
 		
     RCC->CFG |= SYSCLKSEL_HSE;
     RCC->CTRL &= ~HSIEN_BIT;
-    SystemCoreClock = 12000000;
+    SystemCoreClock = 8000000;
 }
 
 void SysClk_PLLEN(uint32_t PLLCLK_MUL)
@@ -78,7 +78,7 @@ void SysClk_PLLEN(uint32_t PLLCLK_MUL)
             break;
         case PLLCLK_MUL_120MHz:
             SystemCoreClock = 120000000;
-        SystemCoreClock = 192000000;
+        
             break;
         case PLLCLK_MUL_128MHz:
             SystemCoreClock = 128000000;

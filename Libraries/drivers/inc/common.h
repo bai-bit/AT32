@@ -52,6 +52,7 @@ typedef enum {false = 0,true = !false} bool;
 
 void DelayInit(void);
 void systick_setexception(bool val);
+void systick_timeout(uint32_t value);
 void delayms(uint32_t num);
 void delayus(uint32_t num);
 uint32_t GetClock_Frequency(CLOCKFRE_t clock);

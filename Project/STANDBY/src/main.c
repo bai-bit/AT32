@@ -60,40 +60,56 @@ int main(int argc,const char *argv[])
     GPIO_Init(HW_GPIOA, GPIO_PIN_5, GPIO_Mode_Out_PP);
     PAout(5) = 1;
 
-    WKUP_Init();//配置待机模式
+//    WKUP_Init();//配置待机模式
     uint8_t data[2] = "";
     double count = 0;
     uint16_t value = 0;
 
 	while(1)
 	{
-        delayms(200);
+//        delayms(200);
         
-        GPIO_PinWrite(HW_GPIOA,GPIO_PIN_5,0);
-        
+//        GPIO_PinWrite(HW_GPIOA,GPIO_PIN_5,0);
+//        
         if(!(GPIOA->OPTDT & (0x1 << 5)))
         {
+            delayms(5);
             if(read_tsic506_byte(&count))
                 printf("read tsic data error\r\n");
             
             value = count * 1000;
+            printf("%f\r\n",count);
 
             data[0] = ((uint8_t)value) & 0xff;
             data[1] = (uint8_t)((value & 0xff00) >> 8);
             
             UART_PutChar(HW_USART2, data[0]);
             UART_PutChar(HW_USART2, data[1]);
+            GPIO_PinToggle(HW_GPIOA,GPIO_PIN_5);
         }
-        GPIO_PinToggle(HW_GPIOA,GPIO_PIN_5);
+        
 
-        PWR_EnterSTANDBYMode();
+//        PWR_EnterSTANDBYMode();
 	}
 }
 
 void EXTI0_IRQHandler(void)
 {
+//    double count = 0;
+//    uint16_t value = 0;
+//    uint8_t data[2] = "";
     Clean_ExtiInter(exti_line0);
-    
+//    
+//    if(read_tsic506_byte(&count))
+//                printf("read tsic data error\r\n");
+//            
+//            value = count * 1000;
+
+//            data[0] = ((uint8_t)value) & 0xff;
+//            data[1] = (uint8_t)((value & 0xff00) >> 8);
+//            
+//            UART_PutChar(HW_USART2, data[0]);
+//            UART_PutChar(HW_USART2, data[1]);
     GPIO_PinWrite(HW_GPIOA,GPIO_PIN_5,0);
     GPIO_PinToggle(HW_GPIOA,GPIO_PIN_9);
 }
