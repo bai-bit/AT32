@@ -32,14 +32,14 @@ int main(int argc,const char *argv[])
     SysClk_HSEEN();
     DelayInit();
 
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     Tsic_Init(&tsic_opt);
     RCC->APB2EN |= AFIO_ENABLEBIT;
     AFIO->MAP |= 0x4;
     
     GPIO_Init(HW_GPIOB, GPIO_PIN_6, GPIO_Mode_AF_PP);
     GPIO_Init(HW_GPIOB, GPIO_PIN_7, GPIO_Mode_IN_FLOATING);
- 	UART_Init(HW_USART1, BAUD_115200);
+    UART_Init(HW_USART1, BAUD_115200);
 
     GPIO_Init(HW_GPIOA, GPIO_PIN_2, GPIO_Mode_AF_PP);
     GPIO_Init(HW_GPIOA, GPIO_PIN_3, GPIO_Mode_IN_FLOATING);
@@ -64,8 +64,8 @@ int main(int argc,const char *argv[])
     double count = 0;
     uint16_t value = 0;
     
-	while(1)
-	{
+    while(1)
+    {
         GPIO_PinWrite(HW_GPIOA,GPIO_PIN_5,0);
 
         if(!(GPIOA->OPTDT & (0x1 << 5)))
@@ -86,7 +86,7 @@ int main(int argc,const char *argv[])
         }
 
         PWR_EnterSTANDBYMode();
-	}
+    }
 }
 
 void EXTI0_IRQHandler(void)
