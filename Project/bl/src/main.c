@@ -37,19 +37,23 @@ uint8_t check_app_pc(uint32_t appaddr);
 uint8_t jump_app;
 int main(int argc, const char *argv[])
 {
-    SysClk_PLLEN(PLLCLK_MUL_192MHz);
+    SysClk_HSIEN();
 
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     DelayInit();
     flash_init();
+  
+    RCC->APB2EN |= AFIO_ENABLEBIT;
+    AFIO->MAP |= 0x4;
     
-    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_AF_PP);
-    GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Mode_IN_FLOATING);
-    UART_Init(HW_USART1,   BAUD_115200);
+    GPIO_Init(HW_GPIOB, GPIO_PIN_6, GPIO_Mode_AF_PP);
+    GPIO_Init(HW_GPIOB, GPIO_PIN_7, GPIO_Mode_IN_FLOATING);
+    UART_Init(HW_USART1, BAUD_115200);
     
     GPIO_Init(HW_GPIOA, GPIO_PIN_2, GPIO_Mode_AF_PP);
     GPIO_Init(HW_GPIOA, GPIO_PIN_3, GPIO_Mode_IN_FLOATING);
     UART_Init(HW_USART2, BAUD_115200);
+    
 
     framing_packet_t fp_t;
     
@@ -87,7 +91,6 @@ uint8_t flash_erase(uint32_t addr)
 void log_uart(void)
 {
     uint8_t i = 0;
-    printf("3");
     for (i = 0;i < 20;i++)
         printf("uart_rx_buf[%d] = [%X]\r\n", i, uart_rx_buf[i]);
 }

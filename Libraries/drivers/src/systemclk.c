@@ -18,7 +18,7 @@ void SysClk_HSEEN(void)
     //切换系统时钟源
     //关闭内部高速时钟
     System_Init();
-    RCC->CTRL |= HSEEN_BIT;
+    RCC->CTRL |= RCC_CTRL_HSEEN;
 	
     do{
         
@@ -27,8 +27,8 @@ void SysClk_HSEEN(void)
     RCC->CFG |= SYSCLK_1 | HCLK_1;
 		
     RCC->CFG |= SYSCLKSEL_HSE;
-    RCC->CTRL &= ~HSIEN_BIT;
-    SystemCoreClock = 8000000;
+    RCC->CTRL &= ~RCC_CTRL_HSIEN;
+    SystemCoreClock = 12000000;
 }
 
 void SysClk_PLLEN(uint32_t PLLCLK_MUL)
@@ -39,7 +39,7 @@ void SysClk_PLLEN(uint32_t PLLCLK_MUL)
     //使能PLL时钟
 	
     System_Init();
-    RCC->CTRL |= HSEEN_BIT;
+    RCC->CTRL |= RCC_CTRL_HSEEN;
 	
     do{
         
@@ -55,7 +55,7 @@ void SysClk_PLLEN(uint32_t PLLCLK_MUL)
     
     RCC->CFG |= PLLRANGE_GR72MHz;
     
-    RCC->CTRL |= PLLEN_BIT;
+    RCC->CTRL |= RCC_CTRL_PLLEN;
     do{
         
     }while ((RCC->CTRL & PLLSTBL_FLAG) == 0);
@@ -116,7 +116,7 @@ void SysClk_PLLEN(uint32_t PLLCLK_MUL)
 void System_Init(void)
 {
     //先使能HSI
-    RCC->CTRL |= HSIEN_BIT;
+    RCC->CTRL |= RCC_CTRL_HSIEN;
     //清除一些配置位
     //RESET SYSCLKSEL AHBPSC APB1PSC APB2PSC
     //RESET HSEEN PLLEN HSEBYPS 
@@ -130,11 +130,5 @@ void SystemInit(void)
 #if defined (__FPU_USED) && (__FPU_USED == 1U)
     SCB->CPACR |= ((3U << 10U * 2U) |        
         (3U << 11U * 2U)  ); 
-#endif
-    
-#ifdef VECT_TAB_SRAM
-    SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM. */
-#else
-    SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH. */
 #endif
 }

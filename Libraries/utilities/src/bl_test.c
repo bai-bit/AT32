@@ -320,13 +320,14 @@ void recv_data(framing_packet_t *fp_t)
 {
     uint16_t length = fp_t->len_low | (uint16_t)fp_t->len_high << 8;
 
-    ack_packet();
-
     if(write_memory_flag && write_memory_start >= bl_remap_ops.app_address)
     {
         bl_remap_ops.bl_write_memory(write_memory_start, (uint16_t *)fp_t->data, length / 2);
         write_memory_start += length;
     }
+    
+    ack_packet();
+    
     if(write_memory_start == app_program.flash_byte_count + app_program.flash_start_addr)
     {
         write_memory_start = 0;
@@ -448,6 +449,8 @@ void JumpToImage(uint32_t addr)
 
     __set_MSP(sp);
     __set_PSP(sp);
-     
+    
+    SCB->VTOR = addr;
+    
     app_address();
 }

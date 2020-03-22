@@ -3,11 +3,6 @@
 #include<at32f4xx.h>
 
 extern uint32_t SystemCoreClock;
-#define VECT_TAB_OFFSET     0x0 
-
-#define HSIEN_BIT           0x0001
-#define HSEEN_BIT           0x10000
-#define PLLEN_BIT           0x01000000
 
 #define HSEEN_Mask          0x10000
 #define HSEBYPS_Mask        0x40000
