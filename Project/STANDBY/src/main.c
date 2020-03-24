@@ -6,7 +6,7 @@
 #include "standby.h"
 #include "tsic506.h"
 #include<stdio.h>
-
+#define ONE_THOUSAND_TIMES (1000)
 void tsic_power(uint8_t status);
 
 uint8_t tsic_data_output(void);
@@ -27,6 +27,7 @@ uint8_t tsic_data_output(void)
 {
     return PAin(7);
 }
+
 int main(int argc,const char *argv[])
 {
     SysClk_HSEEN();
@@ -35,7 +36,7 @@ int main(int argc,const char *argv[])
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     Tsic_Init(&tsic_opt);
     RCC->APB2EN |= AFIO_ENABLEBIT;
-    AFIO->MAP |= 0x4;
+    AFIO->MAP |= AFIO_MAP_USART1_REMAP ;
     
     GPIO_Init(HW_GPIOB, GPIO_PIN_6, GPIO_Mode_AF_PP);
     GPIO_Init(HW_GPIOB, GPIO_PIN_7, GPIO_Mode_IN_FLOATING);
@@ -74,7 +75,7 @@ int main(int argc,const char *argv[])
             if(read_tsic506_byte(&count))
                 printf("read tsic data error\r\n");
             
-            value = count * 1000;
+            value = count * ONE_THOUSAND_TIMES;
             printf("%f\r\n",count);
 
             data[0] = ((uint8_t)value) & 0xff;

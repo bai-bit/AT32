@@ -245,3 +245,19 @@ void NVIC_Init(uint8_t NVIC_IRQChannel, uint8_t PreemptionPriority, uint8_t SubP
     else
         NVIC->ICER[NVIC_IRQChannel >> 0x05] = SET << (NVIC_IRQChannel & NVIC_IRQCHAN_MASK);
 }
+
+void JumpToImage(uint32_t addr)
+{
+    uint32_t *vector_table = (uint32_t *)addr;
+    uint32_t sp = vector_table[0];
+    uint32_t pc = vector_table[1];
+    typedef void(*applcation_entry)(void);
+    applcation_entry app_address = (applcation_entry) pc;
+
+    __set_MSP(sp);
+    __set_PSP(sp);
+    
+    SCB->VTOR = addr;
+    
+    app_address();
+}

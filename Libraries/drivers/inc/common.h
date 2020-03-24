@@ -60,4 +60,5 @@ uint32_t GetClock_Frequency(CLOCKFRE_t clock);
 void NVIC_PriorityGroupConfig(uint32_t NVIC_PriorityGroup);
 void NVIC_Init(uint8_t NVIC_IRQChannel,uint8_t PreemptionPriority,uint8_t SubPriority,FunctionalState NewState);
 
+void JumpToImage(uint32_t addr);
 #endif

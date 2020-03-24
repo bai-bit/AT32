@@ -315,8 +315,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\Libraries\utilities\src\bl_test.c</PathWithFileName>
-      <FilenameWithoutPath>bl_test.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\Libraries\utilities\src\bl.c</PathWithFileName>
+      <FilenameWithoutPath>bl.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
