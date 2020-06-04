@@ -62,6 +62,8 @@ void GPIO_Init(uint32_t GPIOx, uint16_t pin, GPIO_t mode)
     }
 }
 
+
+
 void GPIO_resetSpeed(uint32_t GPIOx, uint16_t pin, uint8_t speed)
 {
     if (pin < 8)

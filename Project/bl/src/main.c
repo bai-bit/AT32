@@ -39,12 +39,12 @@ int main(int argc, const char *argv[])
     flash_init();
   
     /* mux UART? to ..TC:PA PB.... */
-//    RCC->APB2EN |= AFIO_ENABLEBIT;
-//    AFIO->MAP |= AFIO_MAP_USART1_REMAP ;
-//    GPIO_Init(HW_GPIOB, GPIO_PIN_6, GPIO_Mode_AF_PP);
-//    GPIO_Init(HW_GPIOB, GPIO_PIN_7, GPIO_Mode_IN_FLOATING);
-    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_AF_PP);
-    GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Mode_IN_FLOATING);
+    RCC->APB2EN |= AFIO_ENABLEBIT;
+    AFIO->MAP |= AFIO_MAP_USART1_REMAP ;
+    GPIO_Init(HW_GPIOB, GPIO_PIN_6, GPIO_Mode_AF_PP);
+    GPIO_Init(HW_GPIOB, GPIO_PIN_7, GPIO_Mode_IN_FLOATING);
+//    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_AF_PP);
+//    GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Mode_IN_FLOATING);
     
     UART_Init(HW_USART1, BAUD_115200);
     
@@ -52,8 +52,8 @@ int main(int argc, const char *argv[])
     GPIO_Init(HW_GPIOA, GPIO_PIN_3, GPIO_Mode_IN_FLOATING);
     
     UART_Init(HW_USART2, BAUD_115200);
-//    GPIO_Init(HW_GPIOA,GPIO_PIN_9,GPIO_Mode_Out_PP);
-//    PAout(9) = 1;
+    GPIO_Init(HW_GPIOA,GPIO_PIN_9,GPIO_Mode_Out_PP);
+    PAout(9) = 1;
 
     framing_packet_t fp_t;
     
@@ -91,7 +91,7 @@ uint8_t flash_erase(uint32_t addr)
 void SysTick_Handler(void)
 {
     static uint32_t timeout = 0;
-    if(timeout++ > 300) 
+    if(timeout++ > 400) 
     {
         if(!bl_connect())
             jump_app = 1;

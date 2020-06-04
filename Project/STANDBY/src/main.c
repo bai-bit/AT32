@@ -7,6 +7,8 @@
 #include "tsic506.h"
 #include<stdio.h>
 #define ONE_THOUSAND_TIMES (1000)
+#define TSIC506_BREAKDOWN 65.535
+
 void tsic_power(uint8_t status);
 
 uint8_t tsic_data_output(void);
@@ -20,12 +22,12 @@ tsic_oper_t tsic_opt = {
 
 void tsic_power(uint8_t status)
 {
-    PAout(8) = status;
+    GPIO_PinWrite(HW_GPIOB, GPIO_PIN_5, status);
 }
 
 uint8_t tsic_data_output(void)
 {
-    return PAin(7);
+    return PBin(8);
 }
 
 int main(int argc,const char *argv[])
@@ -34,29 +36,33 @@ int main(int argc,const char *argv[])
     DelayInit();
 
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+    
+    /*initialize tsic506*/
     Tsic_Init(&tsic_opt);
+    
+    /*initialize uart1*/
     RCC->APB2EN |= AFIO_ENABLEBIT;
     AFIO->MAP |= AFIO_MAP_USART1_REMAP ;
-    
     GPIO_Init(HW_GPIOB, GPIO_PIN_6, GPIO_Mode_AF_PP);
     GPIO_Init(HW_GPIOB, GPIO_PIN_7, GPIO_Mode_IN_FLOATING);
     UART_Init(HW_USART1, BAUD_115200);
 
+    /*initialize uart2*/
     GPIO_Init(HW_GPIOA, GPIO_PIN_2, GPIO_Mode_AF_PP);
     GPIO_Init(HW_GPIOA, GPIO_PIN_3, GPIO_Mode_IN_FLOATING);
     UART_Init(HW_USART2, BAUD_115200);
 
-    GPIO_Init(HW_GPIOA,GPIO_PIN_9,GPIO_Mode_Out_PP);
+    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_Out_PP);
     PAout(9) = 1;
-    GPIO_Init(HW_GPIOA,GPIO_PIN_8,GPIO_Mode_Out_PP);
-    PAout(8) = 0;
-    GPIO_Init(HW_GPIOA,GPIO_PIN_7,GPIO_Mode_IN_FLOATING);
-
-    GPIO_Init(HW_GPIOA, GPIO_PIN_0, GPIO_Mode_IPD);
-    AFIO_Init(HW_GPIOA,GPIO_PIN_0);
-    Exti_Init(exti_line0, interrupt, rising, ENABLE);
-    NVIC_Init(EXTI0_IRQn, 3, 2, ENABLE);
     
+    //TSIC506 POWER
+    GPIO_Init(HW_GPIOB, GPIO_PIN_5, GPIO_Mode_Out_PP);
+    GPIO_resetSpeed(HW_GPIOB, GPIO_PIN_5, GPIO_Speed_2MHz);
+    GPIO_PinWrite(HW_GPIOB, GPIO_PIN_5, 0);
+
+    //TSIC506 DATA
+    GPIO_Init(HW_GPIOB, GPIO_PIN_8, GPIO_Mode_IPU);
+
     GPIO_Init(HW_GPIOA, GPIO_PIN_5, GPIO_Mode_Out_PP);
     PAout(5) = 1;
 
@@ -64,35 +70,59 @@ int main(int argc,const char *argv[])
     uint8_t data[2] = "";
     double count = 0;
     uint16_t value = 0;
+    int ret = 0;
     
     while(1)
     {
-        GPIO_PinWrite(HW_GPIOA,GPIO_PIN_5,0);
+        GPIO_PinWrite(HW_GPIOA, GPIO_PIN_5, 0);
 
+        ret = 0;
         if(!(GPIOA->OPTDT & (0x1 << 5)))
         {
-            delayms(5);
-            if(read_tsic506_byte(&count))
-                printf("read tsic data error\r\n");
+            delayms(6);
+            
+            ret = read_tsic506_byte(&count);
+            if(ret)
+            {
+                LIB_TRACE("ret = [%d] \r\n", ret);
+                LIB_TRACE("read tsic data error\r\n");
+                PBout(5) = 0;
+            }
+            
+            if(count < -10 || count > 60)
+            {
+                ret = read_tsic506_byte(&count);
+                if(ret)
+                {
+                    LIB_TRACE("ret = [%d] \r\n", ret);
+                    LIB_TRACE("read tsic data error\r\n");
+                    PBout(5) = 0;
+                }
+            }
+            
+            if(count < -10 || count > 60)
+                count = TSIC506_BREAKDOWN;
             
             value = count * ONE_THOUSAND_TIMES;
-            printf("%f\r\n",count);
+
+            LIB_TRACE("%f\r\n",count);
 
             data[0] = ((uint8_t)value) & 0xff;
             data[1] = (uint8_t)((value & 0xff00) >> 8);
             
             UART_PutChar(HW_USART2, data[0]);
             UART_PutChar(HW_USART2, data[1]);
-            GPIO_PinToggle(HW_GPIOA,GPIO_PIN_5);
+            GPIO_PinToggle(HW_GPIOA, GPIO_PIN_5);
         }
 
+        gpio_AINMode();
         PWR_EnterSTANDBYMode();
+
+        while(1)
+        {
+           
+        }
     }
 }
 
-void EXTI0_IRQHandler(void)
-{
-    Clean_ExtiInter(exti_line0);
-    GPIO_PinWrite(HW_GPIOA,GPIO_PIN_5,0);
-    GPIO_PinToggle(HW_GPIOA,GPIO_PIN_9);
-}
+

@@ -72,6 +72,7 @@ typedef enum  {
 }GPIOSpeed;
 
 void GPIO_Init(uint32_t GPIOx, uint16_t pin,GPIO_t mode);
+
 void GPIO_PinWrite(uint32_t GPIOx, uint16_t pin, uint8_t num);
 void GPIO_PinToggle(uint32_t GPIOx, uint16_t pin);
 uint16_t read_gpioport(uint32_t GPIOx, uint16_t pin);
