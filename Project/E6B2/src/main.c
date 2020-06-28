@@ -7,11 +7,8 @@
 #include "rtthread.h"
 #include "rthw.h"
 
-#if (APP_PN == 229)
-#define SYSTEM_HEAP_BASE        (0x20002000)
-#else
+
 #define SYSTEM_HEAP_BASE        (0x20008000)
-#endif
 
 #define SYSTEM_HEAP_SIZE        (24*1024)
 
@@ -195,8 +192,9 @@ void TMR2_GLOBAL_IRQHandler(void)
     if(temp_refer_value)
     {
         count++;
-        if(count % 16 <=3)
+        if(count % 16 ==0)
         {
+            
             if(temp_refer_value > 0)
             {
                 PBout(8) = 0;
@@ -208,12 +206,12 @@ void TMR2_GLOBAL_IRQHandler(void)
                 PBout(9) = 0;
             }
         }
-        else if(count % 16 <= 7)
+        else if(count % 16 <= 7 && count % 16 >= 4)
         {
             PBout(8) = 1;
             PBout(9) = 1;
         }
-        else if(count % 16 <= 11)
+        else if(count % 16 == 8 )
         {
              if(temp_refer_value > 0)
             {
@@ -226,7 +224,7 @@ void TMR2_GLOBAL_IRQHandler(void)
                 PBout(9) = 1;
             }
         }
-        else if(count % 16 <= 15)
+        else if(count % 16 <= 15 && count % 16 >= 12)
         {
             PBout(8) = 0;
             PBout(9) = 0;
