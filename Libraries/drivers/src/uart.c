@@ -36,7 +36,7 @@ uint32_t UART_Init(uint32_t instance, uint32_t baudrate)
 
     tmpreg = uart_list[instance]->CTRL1;
     tmpreg &= CTRL1_MASK;
-    tmpreg |= USART_CTRL1_REN | USART_CTRL1_TEN;
+    tmpreg |= (USART_CTRL1_REN | USART_CTRL1_TEN);
     uart_list[instance]->CTRL1 = (uint16_t)tmpreg;
     
     tmpreg = uart_list[instance]->CTRL2;
@@ -51,8 +51,6 @@ uint32_t UART_Init(uint32_t instance, uint32_t baudrate)
     uart_list[instance]->CTRL3 = (uint16_t)tmpreg;
 
     UART_SetBaudRate(instance,baudrate);
-
-    USART_Cmd(instance, ENABLE);
 
     return 1;
 }
@@ -112,6 +110,7 @@ void USART_ITConfig(uint32_t instance, uint16_t uart_interrupt, FunctionalState 
         *(uint32_t *)uartxbase |= configbit;
     else
         *(uint32_t *)uartxbase &= ~configbit;
+
 }
 
 
@@ -174,6 +173,13 @@ uint32_t UART_GetChar(uint32_t instance, uint8_t *ch)
     return 0;
 }
 
+//static inline int getc(void)
+//{
+//    uint8_t ch;
+//    while(UART_GetChar(HW_USART1, &ch) != 0);
+//    return ch;
+//}
+
 void UART_PutChar(uint32_t instance, uint8_t ch)
 {
     uart_list[instance]->DT  = ch;
@@ -189,45 +195,7 @@ void UART_PutChar(uint32_t instance, uint8_t ch)
 ////    return 0;
 //}
 
-static uint8_t rev1;
-static uint8_t flag = 0;
-void USART1_IRQHandler(void)
-{
-    //接受数据
-    //判断接受标志位
-    //判断接受的数据，0x0a 0x0d	
-    uint8_t rev = 0;
-    
-    if (UART_GetInter(HW_USART1, UART_INT_RDNE) == SET)
-    {
-        rev = UART_RecviveData(HW_USART1);
-        rev1 = rev;
-        flag = 1;
-       
-        if ((uart_rx_status & UART_STATUS_NLINE) == RESET)
-        {
-            if (uart_rx_status & UART_STATUS_ENTER)
-            {
-                if (rev == 0x0a)
-                    uart_rx_status |= UART_STATUS_NLINE;
-                else
-                    uart_rx_status = RESET;
-            }
-            else
-            {
-                if (rev == 0x0d)
-                    uart_rx_status |= UART_STATUS_ENTER;
-                else
-                {
-                    uart_rx_buf[uart_rx_status & UART_STATUS_MASK] = rev;
-                    uart_rx_status++;
-                    if(uart_rx_status > UART_RX_BUF_SIZE)
-                        uart_rx_status = RESET;
-                }
-            }
-        }
-    }
-}
+
 
 
 #pragma import(__use_no_semihosting)             
@@ -248,7 +216,7 @@ void _sys_exit(int x)
 
 int fputc(int ch, FILE *f)
 {      
-    while((USART1->STS & 0X40) == 0)
+    while(!(USART1->STS & USART_STS_TRAC))
         continue;  
     USART1->DT = (uint8_t) ch;      
     return ch;
@@ -256,11 +224,9 @@ int fputc(int ch, FILE *f)
 
 int fgetc(FILE *stream)
 {
-    while(flag == 0)
+    while(!(USART1->STS & USART_STS_RDNE))
         continue;
-    flag = 0;
-    
-    return rev1;	
+    return USART1->DT;
 }
 
 void UART_SendData(uint8_t instance,uint8_t *buf,uint32_t length)

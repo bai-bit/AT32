@@ -18,8 +18,6 @@ void tsic_start(void)
         return ;
     if(wait_edge_trigger(1))
         return ;
-//    wait_edge_trigger(0);
-//    wait_edge_trigger(1);
 }
 
 uint16_t tsic_data(uint8_t *val)
@@ -32,14 +30,11 @@ uint16_t tsic_data(uint8_t *val)
     {
         if(wait_edge_trigger(1))
             return 2;
-//        wait_edge_trigger(1);
         tsic_oper.tsic_delayus(50);
         if(tsic_oper.tsic_data_output())
             temp |= 1 << (8 - i);
         else
             wait_edge_trigger(0);
-//            if(wait_edge_trigger(0))
-//                return 2;
     }
     
     for(i = 0; i < 9; i++)
@@ -50,7 +45,6 @@ uint16_t tsic_data(uint8_t *val)
     
     if(check % 2)
     {
-        printf("        check       error\r\n");
         return 1;
     }
 
@@ -60,7 +54,6 @@ uint16_t tsic_data(uint8_t *val)
 
 void tsic_stop(void)
 {
-//    while(wait_edge_trigger(1));
     wait_edge_trigger(1);
         
 }
@@ -113,7 +106,6 @@ uint8_t wait_edge_trigger(uint8_t status)
     }
     if(i == 0)
     {
-        printf("      timeout      error\r\n");
         return 2;
     }
   

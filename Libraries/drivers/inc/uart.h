@@ -40,7 +40,7 @@ uint32_t UART_Init(uint32_t instance, uint32_t baudrate);
 ITStatus UART_GetInter(uint32_t instance, uint32_t uart_interrupt);
 uint16_t UART_RecviveData(uint32_t instance);
 void UART_SendData(uint8_t uartnum, uint8_t *buf, uint32_t length);
-    void USART_ITConfig(uint32_t uartnum, uint16_t uart_interrupt, FunctionalState NewStatus);
+void USART_ITConfig(uint32_t uartnum, uint16_t uart_interrupt, FunctionalState NewStatus);
 void USART_Cmd(uint32_t uartnum, FunctionalState NewStatus);
 
 uint32_t UART_DeInit(uint32_t MAP);
