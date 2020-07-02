@@ -34,36 +34,71 @@ int main(int argc,const char *argv[])
     SysClk_PLLEN(PLLCLK_MUL_192MHz);
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     DelayInit();
-    imu_data_decode_init();
+
     serial_init();
     simulation_encoder_init();
-    tmr_init(191);
+
+    /* enable TME2 clock */
+    RCC->APB1EN |= RCC_APB1EN_TMR2EN;
+    /* enable enhanced mode 
+    TMR2->CTRL1 |= TMR_CTRL1_PMEN;*/
+    /* reload value */
+    TMR2->AR = 0xFFFFFFFF;
+    /* fractional value */
+    TMR2->DIV = 0;
+    /* encoder mode */
+    TMR2->SMC |= 0X3;
+    /* enable TMR2 */
+    TMR2->CTRL1 |= TMR_CTRL1_CNTEN;
+    
+    
+    /* enable TME3 clock */
+    RCC->APB1EN |= RCC_APB1EN_TMR3EN;
+    /* enable enhanced mode */
+    TMR3->CTRL1 |= TMR_CTRL1_PMEN;
+    /* reload value */
+    TMR3->AR = 0xFFFFFFFF;
+    /* fractional value */
+    TMR3->DIV = 0;
+    /* encoder mode */
+    TMR3->SMC |= 0X3;
+    /* enable TMR2 */
+    TMR3->CTRL1 |= TMR_CTRL1_CNTEN;
+    
+    float tmr2 = 0;
+    int32_t tmr3 = 0;
 
     while(1)
     {
-        refer_value = 0;
-        if(receive_imusol.gyr[2] > 2 && receive_imusol.gyr[2] < 280)
-        {
-            refer_value = receive_imusol.gyr[2];
-            TMR2->AR = 1;
-            TMR2->CTRL1 = TMR_CTRL1_CNTEN;
+
+//        if(receive_imusol.gyr[2] > 2 && receive_imusol.gyr[2] < 280)
+//        {
+//            refer_value = receive_imusol.gyr[2];
+//            TMR2->AR = 1;
+//            TMR2->CTRL1 = TMR_CTRL1_CNTEN;
 
 //            printf("timer_ms = [%d]\r\n", timer_ms);
-        }
-        else if(receive_imusol.gyr[2] < -2 && receive_imusol.gyr[2] > -280)
-        {
-            refer_value = (receive_imusol.gyr[2]);
-//            TMR2->AR = 45000 / refer_value * -1;
-            TMR2->AR = 1;
-            TMR2->CTRL1 = TMR_CTRL1_CNTEN;
+//        }
+//        else if(receive_imusol.gyr[2] < -2 && receive_imusol.gyr[2] > -280)
+//        {
+//            refer_value = (receive_imusol.gyr[2]);
+
+//            TMR2->AR = 1;
+//            TMR2->CTRL1 = TMR_CTRL1_CNTEN;
 //            printf("timer_ms = [%d]\r\n", timer_ms);
-        }
-        else
-        {
-            TMR2->CTRL1 = ~TMR_CTRL1_CNTEN;
-        }
+//        }
+//        else
+//        {
+//            TMR2->CTRL1 = ~TMR_CTRL1_CNTEN;
+//        }
+
         
-        delayms(10);
+        delayms(500);
+        tmr2 = TMR2->CNT;
+        tmr3 = TMR3->CNT;
+        printf("simulation = %f \r\n", tmr2 / 4);
+        printf("encoder    = %d \r\n", tmr3);
+  
     }
 }
 
@@ -74,7 +109,9 @@ void tmr_init(uint32_t div)
     RCC->APB1EN |= RCC_APB1EN_TMR2EN;
     //增强模式使能
     TMR2->CTRL1 |= TMR_CTRL1_PMEN;
+    //向下计数
     TMR2->CTRL1 |= TMR_CTRL1_DIR; 
+    //开启预装载
     TMR2->CTRL1 |= TMR_CTRL1_ARPEN;
     
     TMR2->DIV = div;
@@ -85,15 +122,18 @@ void tmr_init(uint32_t div)
 
 void simulation_encoder_init(void)
 {
-    GPIO_Init(HW_GPIOB, GPIO_PIN_8, GPIO_Mode_Out_PP);
-    GPIO_Init(HW_GPIOB, GPIO_PIN_9, GPIO_Mode_Out_PP);
-    PBout(8) = 0;
-    PBout(9) = 0;
-    
+
     GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_Out_PP);
     GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Mode_Out_PP);
     PAout(9) = 1;
     PAout(10) = 1;
+    
+    GPIO_Init(HW_GPIOA, GPIO_PIN_0, GPIO_Mode_IN_FLOATING);
+    GPIO_Init(HW_GPIOA, GPIO_PIN_1, GPIO_Mode_IN_FLOATING);
+    
+    GPIO_Init(HW_GPIOA, GPIO_PIN_6, GPIO_Mode_IN_FLOATING);
+    GPIO_Init(HW_GPIOA, GPIO_PIN_7, GPIO_Mode_IN_FLOATING);
+    
 }
 
 void serial_init(void)
@@ -103,19 +143,19 @@ void serial_init(void)
     AFIO->MAP |= AFIO_MAP_USART1_REMAP;
     GPIO_Init(HW_GPIOB, GPIO_PIN_6, GPIO_Mode_AF_PP);
     GPIO_Init(HW_GPIOB, GPIO_PIN_7, GPIO_Mode_IPU);
-//    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_AF_PP);
-//    GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Mode_IPU);
+
     UART_Init(HW_USART1, BAUD_115200);
     USART_Cmd(HW_USART1, ENABLE);
+    printf("111\r\n");
     
     /* serial  2 */
-    GPIO_Init(HW_GPIOA, GPIO_PIN_2, GPIO_Mode_AF_PP);
-    GPIO_Init(HW_GPIOA, GPIO_PIN_3, GPIO_Mode_IN_FLOATING);
+//    GPIO_Init(HW_GPIOA, GPIO_PIN_2, GPIO_Mode_AF_PP);
+//    GPIO_Init(HW_GPIOA, GPIO_PIN_3, GPIO_Mode_IN_FLOATING);
 
-    UART_Init(HW_USART2, BAUD_115200);                  
-    USART_ITConfig(HW_USART2, UART_INT_RDNE, ENABLE);
-    USART_Cmd(HW_USART2, ENABLE);
-    NVIC_Init(USART2_IRQn, 2, 2, ENABLE);
+//    UART_Init(HW_USART2, BAUD_115200);                  
+//    USART_ITConfig(HW_USART2, UART_INT_RDNE, ENABLE);
+//    USART_Cmd(HW_USART2, ENABLE);
+//    NVIC_Init(USART2_IRQn, 2, 2, ENABLE);
 }
 
 void systick_start(uint32_t time_us)
@@ -184,6 +224,7 @@ void TMR2_GLOBAL_IRQHandler(void)
     temp_refer_value = refer_value;
 
     TMR2->STS = 0;
+      
     if(temp_refer_value > 0)
         TMR2->AR = 45000 / refer_value;
     else
@@ -192,7 +233,7 @@ void TMR2_GLOBAL_IRQHandler(void)
     if(temp_refer_value)
     {
         count++;
-        if(count % 16 ==0)
+        if(count % 16 == 0)
         {
             
             if(temp_refer_value > 0)

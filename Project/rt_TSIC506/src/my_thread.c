@@ -48,15 +48,18 @@ uint8_t tsic_data_output(void)
 
 void thread1_entry(void *parameter)
 {
-    
     uint8_t data[2] = "";
     double count = 0;
     uint16_t value = 0;
     int ret = 0;
+
     WKUP_Init();
     /*initialize tsic506*/
     Tsic_Init(&tsic_opt);
     
+    rt_device_open(rt_device_find("uart2"), RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_STREAM);
+    printf("ok");
+   
     while(1)
     {
         GPIO_PinWrite(HW_GPIOA, GPIO_PIN_5, 0);
@@ -113,11 +116,9 @@ void thread2_entry(void *parameter)
 
 void init_thread_entry(void* parameter)
 {
-    
-    
     static rt_thread_t tid1 = RT_NULL,tid2 = RT_NULL;
 
-    tid1 = rt_thread_create("t1", thread1_entry, RT_NULL, 512, 8, 20);
+    tid1 = rt_thread_create("t1", thread1_entry, RT_NULL, 1024, 8, THREAD_TIMESLICE);
     if(tid1 != RT_NULL)
         rt_thread_startup(tid1);
 

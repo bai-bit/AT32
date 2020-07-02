@@ -13,55 +13,55 @@
 
 void init_thread_entry(void* parameter);
 
+void system_init(void);
+void serial_gpio_init(void);
+void tsic_port_init(void);
+
 void rt_application_init(void* parameter)
 {
     rt_components_init();
     rt_thread_startup(rt_thread_create("init", init_thread_entry, RT_NULL, 1024, 6, 20));
 }
 
-
-
 int main(void)
 {
-//    int ret;
-//    static rt_device_t serial;
-
     SysClk_PLLEN(PLLCLK_MUL_192MHz);
-    
+  
     DelayInit();
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     
-    /* serial */
-//    RCC->APB2EN |= AFIO_ENABLEBIT;
-//    AFIO->MAP |= AFIO_MAP_USART1_REMAP;
-//    GPIO_Init(HW_GPIOB, GPIO_PIN_6, GPIO_Mode_AF_PP);
-//    GPIO_Init(HW_GPIOB, GPIO_PIN_7, GPIO_Mode_IPU);
-    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_AF_PP);
-    GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Mode_IPU);
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 
-    GPIO_Init(HW_GPIOA, GPIO_PIN_2, GPIO_Mode_AF_PP);
-    GPIO_Init(HW_GPIOA, GPIO_PIN_3, GPIO_Mode_IN_FLOATING);
+    serial_gpio_init();
+    tsic_port_init();
+    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_Out_PP);
+    PAout(9) = 1;
 
-//    UART_Init(HW_USART2, BAUD_115200);
-//    USART_ITConfig(HW_USART2, UART_INT_RDNE, ENABLE);
-//    USART_Cmd(HW_USART2, ENABLE);
+//    printf("ok");
+//    printf("%s %d %s\r\n", __FILE__, __LINE__, __FUNCTION__);
+//    while(1)
+//        continue;
+    system_init();
+}
 
-    //TSIC506 POWER
+void tsic_port_init(void)
+{
+    /* tsic506 power */
     GPIO_Init(HW_GPIOB, GPIO_PIN_5, GPIO_Mode_Out_PP);
     GPIO_resetSpeed(HW_GPIOB, GPIO_PIN_5, GPIO_Speed_2MHz);
     GPIO_PinWrite(HW_GPIOB, GPIO_PIN_5, 0);
 
-    //TSIC506 DATA
+    /* TSIC506 DATA */
     GPIO_Init(HW_GPIOB, GPIO_PIN_8, GPIO_Mode_IPU);
-
+    
+    /* signal gpio  */
     GPIO_Init(HW_GPIOA, GPIO_PIN_5, GPIO_Mode_Out_PP);
     PAout(5) = 1;
-    
-//    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_Out_PP);
-//    PAout(9) = 1;
-    
+}
+
+void system_init(void)
+{
     rt_hw_interrupt_disable();
-    
+
     SysTick_Config(GetClock_Frequency(pll) / RT_TICK_PER_SECOND - 1);
 
     rt_hw_usart_init(SAMPLE_UART_NAME);
@@ -80,15 +80,20 @@ int main(void)
     rt_system_scheduler_start();
 }
 
-void DelayMs(uint32_t ms)
+void serial_gpio_init(void)
 {
-    rt_thread_delay(rt_tick_from_millisecond(ms));
-}
+    /* serial  usart1   afio  PB6 ---> TX, PB7 ---> RX  */
+    RCC->APB2EN |= AFIO_ENABLEBIT;
+    AFIO->MAP |= AFIO_MAP_USART1_REMAP;
+    GPIO_Init(HW_GPIOB, GPIO_PIN_6, GPIO_Mode_AF_PP);
+    GPIO_Init(HW_GPIOB, GPIO_PIN_7, GPIO_Mode_IPU);
+//    UART_Init(HW_USART1, BAUD_115200);
+//    USART_Cmd(HW_USART1, ENABLE);
 
-void DelayUs(uint32_t us)
-{
-    rt_hw_us_delay(us);
-} 
+    /* serial  usart2   PA2 ---> TX, PA3 ---> RX */
+    GPIO_Init(HW_GPIOA, GPIO_PIN_2, GPIO_Mode_AF_PP);
+    GPIO_Init(HW_GPIOA, GPIO_PIN_3, GPIO_Mode_IN_FLOATING);
+}
 
 void SysTick_Handler(void)
 {

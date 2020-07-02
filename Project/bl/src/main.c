@@ -38,13 +38,11 @@ int main(int argc, const char *argv[])
     DelayInit();
     flash_init();
   
-    /* mux UART? to ..TC:PA PB.... */
+    /*  UART1  */
     RCC->APB2EN |= AFIO_ENABLEBIT;
     AFIO->MAP |= AFIO_MAP_USART1_REMAP ;
     GPIO_Init(HW_GPIOB, GPIO_PIN_6, GPIO_Mode_AF_PP);
     GPIO_Init(HW_GPIOB, GPIO_PIN_7, GPIO_Mode_IN_FLOATING);
-//    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_AF_PP);
-//    GPIO_Init(HW_GPIOA, GPIO_PIN_10, GPIO_Mode_IN_FLOATING);
     
     UART_Init(HW_USART1, BAUD_115200);
     
