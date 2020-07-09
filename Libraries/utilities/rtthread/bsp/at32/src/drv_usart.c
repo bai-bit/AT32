@@ -40,93 +40,45 @@ enum {
 #endif
 };
 
-static struct at32_usart usart_config;//[] = {
-//#ifdef BSP_USING_UART1
-//        { "uart1",
-//        USART1,
-//        USART1_IRQn, },
-//#endif
-//#ifdef BSP_USING_UART2
-//        { "uart2",
-//        USART2,
-//        USART2_IRQn, },
-//#endif
-//#ifdef BSP_USING_UART3
-//        { "uart3",
-//        USART3,
-//        USART3_IRQn, },
-//#endif
-//};
+USART_Type* uart_instance_table[]={USART1, USART2, USART3, UART4, UART5};
+
+static struct at32_usart usart_config[] = {
+#ifdef BSP_USING_UART1
+        { "uart1",
+        USART1,
+        USART1_IRQn, },
+#endif
+#ifdef BSP_USING_UART2
+        { "uart2",
+        USART2,
+        USART2_IRQn, },
+#endif
+#ifdef BSP_USING_UART3
+        { "uart3",
+        USART3,
+        USART3_IRQn, },
+#endif
+};
 
 static rt_err_t at32_configure(struct rt_serial_device *serial,
         struct serial_configure *cfg) 
 {
     int32_t instance = -1;
     struct at32_usart *usart_instance = (struct at32_usart *) serial->parent.user_data;
-//    USART_InitType USART_InitStructure;
 
-    RT_ASSERT(serial != RT_NULL);
-    RT_ASSERT(cfg != RT_NULL);
-
-    RT_ASSERT(usart_instance != RT_NULL);
-
-//    at32_msp_usart_init((void *)usart_instance->usartx);
-
-//    USART_StructInit(&USART_InitStructure);
-
-//    USART_Reset(usart_instance->usartx);
-//    USART_InitStructure.USART_BaudRate = cfg->baud_rate;
-//    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-//    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-
-    switch (cfg->data_bits) {
-//    case DATA_BITS_8:
-//        USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-//        break;
-
-//    case DATA_BITS_9:
-//        USART_InitStructure.USART_WordLength = USART_WordLength_9b;
-//        break;
-//    default:
-//        USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-//        break;
-    }
-
-    switch (cfg->stop_bits) {
-//    case STOP_BITS_1:
-//        USART_InitStructure.USART_StopBits = USART_StopBits_1;
-//        break;
-//    case STOP_BITS_2:
-//        USART_InitStructure.USART_StopBits = USART_StopBits_2;
-//        break;
-//    default:
-//        USART_InitStructure.USART_StopBits = USART_StopBits_1;
-//        break;
-    }
-
-    switch (cfg->parity) {
-//    case PARITY_NONE:
-//        USART_InitStructure.USART_Parity = USART_Parity_No;
-//        break;
-//    case PARITY_ODD:
-//        USART_InitStructure.USART_Parity = USART_Parity_Odd;
-//        break;
-//    case PARITY_EVEN:
-//        USART_InitStructure.USART_Parity = USART_Parity_Even;
-//        break;
-//    default:
-//        USART_InitStructure.USART_Parity = USART_Parity_No;
-//        break;
-    }
-//    USART_Init(usart_instance->usartx, &USART_InitStructure);
-//    USART_Cmd(usart_instance->usartx, ENABLE);
-    
     if(!rt_strcmp(usart_instance->name , "uart1"))
         instance = 0;
     else if(!rt_strcmp(usart_instance->name, "uart2"))
         instance = 1;
     else if(!rt_strcmp(usart_instance->name, "uart3"))
         instance = 2;
+    
+    
+    set_worldlength(instance, cfg->data_bits);
+
+    set_stop_bits(instance, cfg->stop_bits);
+
+    set_parity_bits(instance, cfg->parity);
         
     UART_Init(instance, cfg->baud_rate);
     USART_Cmd(instance, ENABLE);
@@ -137,29 +89,34 @@ static rt_err_t at32_configure(struct rt_serial_device *serial,
 static rt_err_t at32_control(struct rt_serial_device *serial, int cmd,
         void *arg) 
 {
-//    struct at32_usart *usart;
+    struct at32_usart *usart;
+    uint8_t instance;
 
-//    NVIC_InitType NVIC_InitStruct;
+    usart = (struct at32_usart *) serial->parent.user_data;
 
-//    RT_ASSERT(serial != RT_NULL);
-//    usart = (struct at32_usart *) serial->parent.user_data;
-//    RT_ASSERT(usart != RT_NULL);
-
-//    NVIC_InitStruct.NVIC_IRQChannel = usart->irqn;
-//    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 2;
-//    NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
-
-    switch (cmd) {
-//    case RT_DEVICE_CTRL_CLR_INT:
-//        NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
-//        NVIC_Init(&NVIC_InitStruct);
-//        USART_INTConfig(usart->usartx, USART_INT_RDNE, DISABLE);
-//        break;
-//    case RT_DEVICE_CTRL_SET_INT:
-//        NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-//        NVIC_Init(&NVIC_InitStruct);
-//        USART_INTConfig(usart->usartx, USART_INT_RDNE, ENABLE);
-//        break;
+    if(usart->usartx == USART1)
+        instance = HW_USART1;
+    else if(usart->usartx == USART2)
+        instance = HW_USART2;
+    else if(usart->usartx == USART3)
+        instance = HW_USART3;
+    else if(usart->usartx == UART4)
+        instance = HW_UART4;
+    else if(usart->usartx == UART5)
+        instance = HW_UART5;
+    
+    switch (cmd) 
+    {
+        case RT_DEVICE_CTRL_CLR_INT:
+        
+            NVIC_Init(instance,2,1,DISABLE);
+            USART_ITConfig(instance, UART_INT_RDNE, DISABLE);
+            break;
+        case RT_DEVICE_CTRL_SET_INT:
+        
+            NVIC_Init(instance,2,1,ENABLE);
+            USART_ITConfig(instance, UART_INT_RDNE, ENABLE);
+            break;
     }
 
     return RT_EOK;
@@ -205,14 +162,12 @@ static const struct rt_uart_ops at32_usart_ops = {
 
 static void usart_isr(struct rt_serial_device *serial) 
 {
-//    struct at32_usart *usart_instance;
+    struct at32_usart *usart_instance;
 
-//    RT_ASSERT(serial != RT_NULL);
+    usart_instance = (struct at32_usart *) serial->parent.user_data;
 
-//    usart_instance = (struct at32_usart *) serial->parent.user_data;
-//    RT_ASSERT(usart_instance != RT_NULL);
 
-//    if ((USART_GetITStatus(usart_instance->usartx, USART_INT_RDNE) != RESET) \
+//    if ((USART_GetITStatus(usart_instance->usartx, UART_INT_RDNE) != RESET) \
 //        && (RESET != USART_GetFlagStatus(usart_instance->usartx, USART_FLAG_RDNE))) {
 //        rt_hw_serial_isr(serial, RT_SERIAL_EVENT_RX_IND);
 //        USART_ClearITPendingBit(usart_instance->usartx, USART_INT_RDNE);
@@ -232,51 +187,47 @@ static void usart_isr(struct rt_serial_device *serial)
 //    }
 }
 
-//void USART1_IRQHandler(void) {
-//    rt_interrupt_enter();
+void USART1_IRQHandler(void) 
+{
+    rt_interrupt_enter();
 
-//    usart_isr(&usart_config[USART1_INDEX].serial);
+    usart_isr(&usart_config[USART1_INDEX].serial);
 
-//    rt_interrupt_leave();
-//}
+    rt_interrupt_leave();
+}
 
 
-//void USART2_IRQHandler(void) {
-//    rt_interrupt_enter();
+void USART2_IRQHandler(void) 
+{
+    rt_interrupt_enter();
 
-//    usart_isr(&usart_config[USART2_INDEX].serial);
+    usart_isr(&usart_config[USART2_INDEX].serial);
 
-//    rt_interrupt_leave();
-//}
+    rt_interrupt_leave();
+}
 
-USART_Type* uart_instance_table[]={USART1, USART2, USART3, UART4, UART5};
+
 
 int rt_hw_usart_init(const char *name)
 {
     rt_size_t obj_num;
-    int index = -1;
-    
+    int index;
+
+    obj_num = sizeof(usart_config) / sizeof(struct at32_usart);
     struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;
     rt_err_t result = 0;
 
-    if(!rt_strcmp(name,"uart1"))
-        index = 0;
-    else if(!rt_strcmp(name, "uart2"))
-        index = 1;
-    else if(!rt_strcmp(name, "uart3"))
-        index = 2;
-
-    usart_config.name = (char *)name;
-    usart_config.usartx = uart_instance_table[index];
-    usart_config.serial.ops = &at32_usart_ops;
-    usart_config.serial.config = config;
+    for (index = 0; index < obj_num; index++) {
+        usart_config[index].serial.ops = &at32_usart_ops;
+        usart_config[index].serial.config = config;
 
         /* register UART device */
-        result = rt_hw_serial_register(&usart_config.serial,
-                usart_config.name,
+        result = rt_hw_serial_register(&usart_config[index].serial,
+                usart_config[index].name,
                 RT_DEVICE_FLAG_RDWR | RT_DEVICE_FLAG_INT_RX
-                        | RT_DEVICE_FLAG_INT_TX, &usart_config);
+                        | RT_DEVICE_FLAG_INT_TX, &usart_config[index]);
         RT_ASSERT(result == RT_EOK);
+    }
 
 
     return result;

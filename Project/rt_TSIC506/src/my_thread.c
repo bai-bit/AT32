@@ -5,6 +5,14 @@
 #include "uart.h"
 #include "tsic506.h"
 #include "standby.h"
+#include "drv_gpio.h"
+
+/* defined the LED2 pin: PD13 */
+#define LED2_PIN    GET_PIN(D, 13)
+/* defined the LED3 pin: PD14 */
+#define LED3_PIN    GET_PIN(D, 14)
+/* defined the LED4 pin: PD15 */
+#define LED4_PIN    GET_PIN(D, 15)
 
 #define ONE_THOUSAND_TIMES (1000)
 #define TSIC506_BREAKDOWN 65.535
@@ -53,7 +61,7 @@ void thread1_entry(void *parameter)
     uint16_t value = 0;
     int ret = 0;
 
-    WKUP_Init();
+//    WKUP_Init();
     /*initialize tsic506*/
     Tsic_Init(&tsic_opt);
     
@@ -67,7 +75,7 @@ void thread1_entry(void *parameter)
         ret = 0;
         if(!(GPIOA->OPTDT & (0x1 << 5)))
         {
-            delayms(6);
+            rt_thread_mdelay(6);
             
             ret = read_tsic506_byte(&count);
             if(ret)
@@ -101,6 +109,7 @@ void thread1_entry(void *parameter)
             UART_PutChar(HW_USART2, data[0]);
             UART_PutChar(HW_USART2, data[1]);
             GPIO_PinToggle(HW_GPIOA, GPIO_PIN_5);
+            
         }
 
 //        gpio_AINMode();
@@ -110,15 +119,37 @@ void thread1_entry(void *parameter)
 
 void thread2_entry(void *parameter)
 {
+    uint32_t Speed = 200;
+    /* set LED2 pin mode to output */
+    rt_pin_mode(LED2_PIN, PIN_MODE_OUTPUT);
+    /* set LED3 pin mode to output */
+    rt_pin_mode(LED3_PIN, PIN_MODE_OUTPUT);
+    /* set LED4 pin mode to output */
+    rt_pin_mode(LED4_PIN, PIN_MODE_OUTPUT);
+    
     while(1)
-        rt_thread_mdelay(100);
+    {
+        rt_pin_write(LED2_PIN, PIN_LOW);
+        rt_thread_mdelay(Speed);
+        rt_pin_write(LED3_PIN, PIN_LOW);
+        rt_thread_mdelay(Speed);
+        rt_pin_write(LED4_PIN, PIN_LOW);
+        rt_thread_mdelay(Speed);
+        rt_pin_write(LED2_PIN, PIN_HIGH);
+        rt_thread_mdelay(Speed);
+        rt_pin_write(LED3_PIN, PIN_HIGH);
+        rt_thread_mdelay(Speed);
+        rt_pin_write(LED4_PIN, PIN_HIGH);
+        rt_thread_mdelay(Speed);
+    }
+        
 }
 
 void init_thread_entry(void* parameter)
 {
     static rt_thread_t tid1 = RT_NULL,tid2 = RT_NULL;
 
-    tid1 = rt_thread_create("t1", thread1_entry, RT_NULL, 1024, 8, THREAD_TIMESLICE);
+    tid1 = rt_thread_create("t1", thread1_entry, RT_NULL, 1024, 10, THREAD_TIMESLICE);
     if(tid1 != RT_NULL)
         rt_thread_startup(tid1);
 

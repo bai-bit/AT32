@@ -65,7 +65,7 @@ int main(int argc,const char *argv[])
     /* enable TMR2 */
     TMR3->CTRL1 |= TMR_CTRL1_CNTEN;
     
-    float tmr2 = 0;
+    uint32_t tmr2 = 0;
     int32_t tmr3 = 0;
 
     while(1)
@@ -96,7 +96,7 @@ int main(int argc,const char *argv[])
         delayms(500);
         tmr2 = TMR2->CNT;
         tmr3 = TMR3->CNT;
-        printf("simulation = %f \r\n", tmr2 / 4);
+        printf("simulation = %d \r\n", tmr2 / 4);
         printf("encoder    = %d \r\n", tmr3);
   
     }

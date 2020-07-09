@@ -173,13 +173,6 @@ uint32_t UART_GetChar(uint32_t instance, uint8_t *ch)
     return 0;
 }
 
-//static inline int getc(void)
-//{
-//    uint8_t ch;
-//    while(UART_GetChar(HW_USART1, &ch) != 0);
-//    return ch;
-//}
-
 void UART_PutChar(uint32_t instance, uint8_t ch)
 {
     uart_list[instance]->DT  = ch;
@@ -237,4 +230,72 @@ void UART_SendData(uint8_t instance,uint8_t *buf,uint32_t length)
     {
         UART_PutChar(instance,buf[i]);
     }
+}
+
+#define USART_Parity_No    0
+#define USART_Parity_Odd   1
+#define USART_Parity_Even  2
+#define DATA_BITS_8 8
+#define DATA_BITS_9 9
+#define STOP_BITS_1 0
+#define STOP_BITS_2 1
+
+void set_parity_bits(uint32_t instance, uint32_t parity)
+{
+    uint32_t temp = 0;
+    
+    switch (parity) 
+    {
+        case USART_Parity_No:
+            temp &= ~USART_CTRL1_PCEN;
+            break;
+        case USART_Parity_Odd:
+            temp = USART_CTRL1_PCEN;
+            break;
+        case USART_Parity_Even:
+            temp = USART_CTRL1_PSEL | USART_CTRL1_PCEN;
+            break;
+        default:
+            temp &= ~USART_CTRL1_PCEN;
+            break;
+    }
+    uart_list[instance]->CTRL1 |= temp;
+}
+
+void set_stop_bits(uint32_t instance, uint32_t stop_bit)
+{
+    uint32_t temp = 0;
+        switch (stop_bit) 
+    {
+        case STOP_BITS_1:
+            temp = 0;
+            break;
+        case STOP_BITS_2:
+            temp = USART_CTRL2_STOP_B1;
+            break;
+        default:
+            temp = 0;
+            break;
+    }
+    uart_list[instance]->CTRL2 |= temp;
+}
+
+void set_worldlength(uint32_t instance, uint32_t len)
+{
+    uint32_t temp = 0;
+    
+    switch (len) 
+    {
+        case DATA_BITS_8: 
+            temp = 0;
+            break;
+        case DATA_BITS_9:
+            temp = USART_CTRL1_LEN;
+            break;
+        default:
+            temp = 0;
+            break;
+    }
+    
+    uart_list[instance]->CTRL1 |= temp;
 }

@@ -5,6 +5,7 @@
 #include "rtthread.h"
 #include "rthw.h"
 #include <drv_usart.h>
+#include "drv_gpio.h"
 
 #define SAMPLE_UART_NAME "uart1"
 
@@ -33,13 +34,10 @@ int main(void)
 
     serial_gpio_init();
     tsic_port_init();
-    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_Out_PP);
-    PAout(9) = 1;
+//    GPIO_Init(HW_GPIOA, GPIO_PIN_9, GPIO_Mode_Out_PP);
+//    PAout(9) = 1;
 
-//    printf("ok");
-//    printf("%s %d %s\r\n", __FILE__, __LINE__, __FUNCTION__);
-//    while(1)
-//        continue;
+
     system_init();
 }
 
@@ -70,7 +68,7 @@ void system_init(void)
     rt_show_version();
     rt_system_timer_init();
     rt_system_scheduler_init();
-    
+    rt_hw_pin_init();
     rt_device_init_all();
     rt_system_timer_thread_init();
     rt_thread_idle_init();

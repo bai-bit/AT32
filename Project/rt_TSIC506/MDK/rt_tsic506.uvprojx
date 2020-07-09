@@ -471,6 +471,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\Libraries\utilities\rtthread\components\drivers\serial\serial.c</FilePath>
             </File>
+            <File>
+              <FileName>pin.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\Libraries\utilities\rtthread\components\drivers\misc\pin.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -515,6 +520,11 @@
               <FileName>standby.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\Libraries\drivers\src\standby.c</FilePath>
+            </File>
+            <File>
+              <FileName>exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\Libraries\drivers\src\exti.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -720,6 +730,11 @@
               <FileName>drv_usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\Libraries\utilities\rtthread\bsp\at32\src\drv_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\Libraries\utilities\rtthread\bsp\at32\src\drv_gpio.c</FilePath>
             </File>
           </Files>
         </Group>

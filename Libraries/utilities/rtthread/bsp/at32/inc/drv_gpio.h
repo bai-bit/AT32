@@ -11,7 +11,7 @@
 #ifndef __DRV_GPIO_H__
 #define __DRV_GPIO_H__
 
-#include <board.h>
+//#include <board.h>
 #include <rthw.h>
 #include <rtdevice.h>
 
@@ -34,7 +34,7 @@
 struct pin_index
 {
     int index;
-    GPIO_Type *gpio;
+    uint8_t gpio;
     rt_uint32_t pin;
     rt_uint32_t portsource;
     rt_uint32_t pinsource;
@@ -44,7 +44,7 @@ struct pin_irq_map
 {
     rt_uint16_t pinbit;
     rt_uint16_t lineno;
-    IRQn_Type irqno;
+//    IRQn_Type irqno;
 };
 
 int rt_hw_pin_init(void);

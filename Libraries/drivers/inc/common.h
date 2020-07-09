@@ -40,9 +40,13 @@
 #define LIB_DEBUG 
 #if defined(LIB_DEBUG)
 #include <stdio.h>
-#define LIB_TRACE printf
+#define LIB_TRACE(fmt,args...) \
+do{\
+    printf("<<File:%s Line:%d Function:%s >>\r\n", __FILE__, __LINE__, __FUNCTION__);\
+    printf(fmt,##args);\
+}while(0)
 #else
-#define LIB_TRACE(...)
+#define LIB_TRACE(fmt,args...)
 #endif
 
 

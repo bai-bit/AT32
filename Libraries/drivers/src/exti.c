@@ -1,7 +1,6 @@
 //Õ‚≤ø÷–∂œ
 #include<exti.h>
 
-extern u8 uart_read_buf[UART_SIZE];
 extern uint16_t uart_read_status;
 
 void Exti_Init(uint32_t exti_line, EXTI_MODE exti_mode, TRIGGER_MODE trigger_mode, FunctionalState NewStatus)
