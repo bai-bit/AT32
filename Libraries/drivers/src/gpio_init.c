@@ -27,7 +27,7 @@ void GPIO_Init(uint32_t GPIOx, uint16_t pin, GPIO_t mode)
     
     pinmode = mode & 0xf;
     if ((mode & 0x10) == 0x10)
-        pinmode |= GPIO_Speed_50MHz;
+        pinmode |= GPIO_Speed_2MHz;
     
     if (pin < 8) 
     {

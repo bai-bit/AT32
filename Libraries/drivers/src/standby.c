@@ -12,7 +12,7 @@ void PWR_EnterSTANDBYMode(void)
 {
     GPIOA->CTRLL = 0x0;
     GPIOA->CTRLH = 0x0;
-    GPIOB->CTRLL = 0x0;
+    GPIOB->CTRLL = 0x00200000;
     GPIOB->CTRLH = 0X0;
     GPIOC->CTRLL = 0x0;
     GPIOC->CTRLH = 0x0;
@@ -22,10 +22,13 @@ void PWR_EnterSTANDBYMode(void)
     GPIOE->CTRLH = 0x0;
     
     RCC->APB2EN |= 0x7C;
+    
     /* Clear Wake-up flag */
     PWR->CTRL |= PWR_CTRL_CLWUF;
+    
     /* Select STANDBY mode */
     PWR->CTRL |= PWR_CTRL_PDDS;
+    
     /* Set SLEEPDEEP bit of Cortex System Control Register */
     SCB->SCR |= SCB_SCR_SLEEPDEEP;
     /* This option is used to ensure that store operations are completed */
@@ -33,5 +36,6 @@ void PWR_EnterSTANDBYMode(void)
     __force_stores();
 #endif
     /* Request Wait For Interrupt */
+    
     __WFI();
 }

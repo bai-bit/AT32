@@ -1,15 +1,25 @@
 #include "tsic506.h"
+#include "gpio_init.h"
+#include "common.h"
+
 uint8_t wait_edge_trigger(uint8_t status);
 
 tsic_oper_t tsic_oper;
+
+//remap tsic 
 void Tsic_Init(tsic_oper_t *remap_tsic_oper)
 {
     memcpy(&tsic_oper, remap_tsic_oper, sizeof(tsic_oper));
 }
+
 void tsic_start(void)
 {
-    wait_edge_trigger(0);
-    wait_edge_trigger(1);
+    if(wait_edge_trigger(0))
+        return ;
+    if(wait_edge_trigger(1))
+        return ;
+//    wait_edge_trigger(0);
+//    wait_edge_trigger(1);
 }
 
 uint16_t tsic_data(uint8_t *val)
@@ -20,12 +30,16 @@ uint16_t tsic_data(uint8_t *val)
         
     for(i = 0; i < 9; i++)
     {
-        wait_edge_trigger(1);
+        if(wait_edge_trigger(1))
+            return 2;
+//        wait_edge_trigger(1);
         tsic_oper.tsic_delayus(50);
         if(tsic_oper.tsic_data_output())
             temp |= 1 << (8 - i);
         else
             wait_edge_trigger(0);
+//            if(wait_edge_trigger(0))
+//                return 2;
     }
     
     for(i = 0; i < 9; i++)
@@ -35,48 +49,57 @@ uint16_t tsic_data(uint8_t *val)
     }
     
     if(check % 2)
+    {
+//        printf("        check       error\r\n");
         return 1;
+    }
 
     *val = (temp >> 1);
     return 0;
 }
 
+//void 
+
 void tsic_stop(void)
 {
+//    while(wait_edge_trigger(1));
     wait_edge_trigger(1);
+    wait_edge_trigger(0);
+        
 }
+
 uint8_t read_tsic506_byte(double *value)
 {
-    //判断PA7上的高低电平变化
     //如何判断，根据占空比来判断
     //tsic_start()
     //tsic_data()
     //tsic_stop()
     //每个位都是从下降沿开始高电平结束
     //一个周期是125us
-
+   
     uint8_t temp1 = 0,temp2 = 0;
     uint32_t data = 0;
     tsic_oper.tsic_power(1);
-    tsic_oper.tsic_delayus(120);
-    
+    tsic_oper.tsic_delayms(130);
     wait_edge_trigger(1);
     tsic_start();
-    
+
     if(tsic_data(&temp1))
         return 1;
-    
+
     tsic_stop();
+        
     tsic_start();
+        
     if(tsic_data(&temp2))
-        return 1;
-    
+        return 2;
+
+    tsic_oper.tsic_power(0);
+
     data |= temp2;
     data |= temp1 << 8;
 
     *value = ((double) data) / 2047 * 70 - 10;
-    
-    tsic_oper.tsic_power(0);
 
     return 0;
 }
@@ -91,7 +114,10 @@ uint8_t wait_edge_trigger(uint8_t status)
         i--;
     }
     if(i == 0)
-        return 1;
+    {
+        printf("      timeout      error\r\n");
+        return 2;
+    }
   
     return 0;
 }
