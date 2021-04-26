@@ -8,7 +8,7 @@ void WKUP_Init(void)
     PWR->CTRLSTS |= PWR_CTRLSTS_WUPEN;
 }
 
-void PWR_EnterSTANDBYMode(void)
+void gpio_AINMode(void)
 {
     GPIOA->CTRLL = 0x0;
     GPIOA->CTRLH = 0x0;
@@ -22,7 +22,14 @@ void PWR_EnterSTANDBYMode(void)
     GPIOE->CTRLH = 0x0;
     
     RCC->APB2EN |= 0x7C;
+<<<<<<< HEAD
     
+=======
+}
+
+void PWR_EnterSTANDBYMode(void)
+{
+>>>>>>> fa4ca72b7e608c3512539f863cdc4c79d1dd57e0
     /* Clear Wake-up flag */
     PWR->CTRL |= PWR_CTRL_CLWUF;
     

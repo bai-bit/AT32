@@ -2,7 +2,6 @@
 #define __EXTI_H
 #include<at32f4xx.h>
 
-#define UART_SIZE   4096
 #define exti_line0  (0)
 #define exti_line1  (1)
 #define exti_line2  (2)

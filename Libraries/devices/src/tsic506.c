@@ -18,8 +18,11 @@ void tsic_start(void)
         return ;
     if(wait_edge_trigger(1))
         return ;
+<<<<<<< HEAD
 //    wait_edge_trigger(0);
 //    wait_edge_trigger(1);
+=======
+>>>>>>> fa4ca72b7e608c3512539f863cdc4c79d1dd57e0
 }
 
 uint16_t tsic_data(uint8_t *val)
@@ -32,7 +35,10 @@ uint16_t tsic_data(uint8_t *val)
     {
         if(wait_edge_trigger(1))
             return 2;
+<<<<<<< HEAD
 //        wait_edge_trigger(1);
+=======
+>>>>>>> fa4ca72b7e608c3512539f863cdc4c79d1dd57e0
         tsic_oper.tsic_delayus(50);
         if(tsic_oper.tsic_data_output())
             temp |= 1 << (8 - i);
@@ -50,7 +56,10 @@ uint16_t tsic_data(uint8_t *val)
     
     if(check % 2)
     {
+<<<<<<< HEAD
 //        printf("        check       error\r\n");
+=======
+>>>>>>> fa4ca72b7e608c3512539f863cdc4c79d1dd57e0
         return 1;
     }
 
@@ -64,7 +73,10 @@ void tsic_stop(void)
 {
 //    while(wait_edge_trigger(1));
     wait_edge_trigger(1);
+<<<<<<< HEAD
     wait_edge_trigger(0);
+=======
+>>>>>>> fa4ca72b7e608c3512539f863cdc4c79d1dd57e0
         
 }
 
@@ -76,11 +88,20 @@ uint8_t read_tsic506_byte(double *value)
     //tsic_stop()
     //每个位都是从下降沿开始高电平结束
     //一个周期是125us
+<<<<<<< HEAD
    
     uint8_t temp1 = 0,temp2 = 0;
     uint32_t data = 0;
     tsic_oper.tsic_power(1);
     tsic_oper.tsic_delayms(130);
+=======
+    //增加检查函数，防止读取的时机错误
+    uint8_t temp1 = 0,temp2 = 0;
+    uint32_t data = 0;
+    tsic_oper.tsic_power(1);
+    tsic_oper.tsic_delayus(120);
+    tsic_oper.tsic_delayms(140);
+>>>>>>> fa4ca72b7e608c3512539f863cdc4c79d1dd57e0
     wait_edge_trigger(1);
     tsic_start();
 
@@ -106,7 +127,7 @@ uint8_t read_tsic506_byte(double *value)
 
 uint8_t wait_edge_trigger(uint8_t status)
 {
-    int i = 100000;
+    int i = 10000;
 
     while(tsic_oper.tsic_data_output() == status && i)
     {
@@ -115,7 +136,10 @@ uint8_t wait_edge_trigger(uint8_t status)
     }
     if(i == 0)
     {
+<<<<<<< HEAD
         printf("      timeout      error\r\n");
+=======
+>>>>>>> fa4ca72b7e608c3512539f863cdc4c79d1dd57e0
         return 2;
     }
   

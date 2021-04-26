@@ -40,7 +40,7 @@ uint32_t UART_Init(uint32_t instance, uint32_t baudrate);
 ITStatus UART_GetInter(uint32_t instance, uint32_t uart_interrupt);
 uint16_t UART_RecviveData(uint32_t instance);
 void UART_SendData(uint8_t uartnum, uint8_t *buf, uint32_t length);
-    void USART_ITConfig(uint32_t uartnum, uint16_t uart_interrupt, FunctionalState NewStatus);
+void USART_ITConfig(uint32_t uartnum, uint16_t uart_interrupt, FunctionalState NewStatus);
 void USART_Cmd(uint32_t uartnum, FunctionalState NewStatus);
 
 uint32_t UART_DeInit(uint32_t MAP);
@@ -51,5 +51,9 @@ uint32_t UART_SetIntMode(uint32_t instance, UART_Int_t mode, uint8_t val);
 
 int fgetc(FILE *stream);
 void call_back_send(uint8_t uartnum, uint8_t ch);
+
+void set_parity_bits(uint32_t instance, uint32_t parity);
+void set_stop_bits(uint32_t instance, uint32_t stop_bit);
+void set_worldlength(uint32_t instance, uint32_t len);
 
 #endif
